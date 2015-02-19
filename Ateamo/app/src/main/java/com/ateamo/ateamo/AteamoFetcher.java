@@ -19,7 +19,6 @@ interface CallBack {
 }
 
 
-
 public class AteamoFetcher {
 
     public static final AteamoFetcher sharedInstance = new AteamoFetcher();
