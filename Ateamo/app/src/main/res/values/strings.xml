@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Ateamo</string>
+    <string name="preference_file_key">"com.ateamo.PREFERENCE_FILE_KEY"</string>
+</resources>
