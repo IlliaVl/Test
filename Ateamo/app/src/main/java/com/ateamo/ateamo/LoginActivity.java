@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -67,7 +68,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+//                    attemptLogin();
+                    attemptLoginFake();
                     return true;
                 }
                 return false;
@@ -78,7 +80,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                attemptLoginFake();
+//                attemptLogin();
             }
         });
 
@@ -91,6 +94,17 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
 
+    public void attemptLoginFake() {
+        showProgress(true);
+        AteamoFetcher.sharedInstance.login(this, "", "", new CallBack() {
+            @Override
+            public void requestResponse(JSONObject response) {
+                showProgress(false);
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
@@ -143,6 +157,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 @Override
                 public void requestResponse(JSONObject response) {
                     showProgress(false);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
                 }
             });
 //            mAuthTask = new UserLoginTask(email, password);

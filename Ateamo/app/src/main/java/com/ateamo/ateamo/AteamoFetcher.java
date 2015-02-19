@@ -46,10 +46,10 @@ public class AteamoFetcher {
         params.put("grant_type", "password");
         params.put("client_id", "ios");
         params.put("client_secret", clientSecret);
-        params.put("username", username);
-        params.put("password", password);
-//        params.put("username", "iliavl@list.ru");
-//        params.put("password", "p@ssword");
+//        params.put("username", username);
+//        params.put("password", password);
+        params.put("username", "iliavl@list.ru");
+        params.put("password", "p@ssword");
 //        client.post(urlString, params, new JsonHttpResponseHandler()   
         AteamoRestClient.post(authUrlString, params, new AsyncHttpResponseHandler() {
             @Override
