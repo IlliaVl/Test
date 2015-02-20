@@ -36,7 +36,10 @@
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:id="@+id/teamsListView"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:background="#ff000000"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1dp" />
 
     </LinearLayout>
 

@@ -8,10 +8,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_width="fill_parent"
 android:layout_height="?android:attr/listPreferredItemHeight"
-android:padding="6dip" >
+android:padding="6dip"
+    android:background="#ff000000">
 
 <ImageView
-    android:id="@+id/icon"
+    android:id="@+id/teamBadgeImageView"
     android:layout_width="33dp"
     android:layout_height="37dp"
     android:layout_alignParentBottom="true"
@@ -27,9 +28,11 @@ android:padding="6dip" >
         android:layout_alignWithParentIfMissing="true"
         android:gravity="center_vertical"
     android:text="Example application"
-    android:textSize="16sp"
+    android:textSize="18sp"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/icon"
-        android:layout_toEndOf="@+id/icon" />
+        android:layout_toRightOf="@+id/teamBadgeImageView"
+        android:layout_toEndOf="@+id/teamBadgeImageView"
+        android:textColor="#ffffffff"
+        android:textStyle="bold" />
 
 </RelativeLayout>
