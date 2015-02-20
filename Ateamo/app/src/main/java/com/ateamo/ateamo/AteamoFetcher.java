@@ -8,6 +8,8 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,14 +26,14 @@ public class AteamoFetcher {
     public static final AteamoFetcher sharedInstance = new AteamoFetcher();
 
     static final String baseUrlString = "https://api.ateamo.com";
-    static final String  authUrlString = "/oauth/token";
-    static final String  teamsUrlString = "/teams";
-    static final String  membersUrlString = "/members";
-    static final String  clientSecret = "Wt}{tS{KG{U<uP&Iz],$,O6>*pG`NdP9]^#/bTkj5i($s!|PuVcKA0B!x-86~KUV";
+    static final String authUrlString = "/oauth/token";
+    static final String teamsUrlString = "/teams";
+    static final String membersUrlString = "/members";
+    static final String clientSecret = "Wt}{tS{KG{U<uP&Iz],$,O6>*pG`NdP9]^#/bTkj5i($s!|PuVcKA0B!x-86~KUV";
 
-    static final String  ACCESS_TOKEN_FIELD_ID = "access_token";
-    static final String  EXPIRES_IN_FIELD_ID = "expires_in";
-    static final String  REFRESH_TOKEN_FIELD_ID = "refresh_token";
+    static final String ACCESS_TOKEN_FIELD_ID = "access_token";
+    static final String EXPIRES_IN_FIELD_ID = "expires_in";
+    static final String REFRESH_TOKEN_FIELD_ID = "refresh_token";
 
     private Context context;
 
@@ -39,9 +41,12 @@ public class AteamoFetcher {
     private Integer expiresIn = 0;
     private String refreshToken = "";
 
+    private CallBack callback;
+
 
     void login(Context context, String username, String password, final CallBack loggedInCallback) {
         this.context = context;
+        callback = loggedInCallback;
         RequestParams params = new RequestParams();
         params.put("grant_type", "password");
         params.put("client_id", "ios");
@@ -50,19 +55,18 @@ public class AteamoFetcher {
 //        params.put("password", password);
         params.put("username", "iliavl@list.ru");
         params.put("password", "p@ssword");
-//        client.post(urlString, params, new JsonHttpResponseHandler()   
         AteamoRestClient.post(authUrlString, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-//                        JSONObject arr = new JSONObject(new String(byte));
                 String decodedData = new String(responseBody);
                 try {
                     JSONObject jsonObject = new JSONObject(decodedData);
-                    loggedInCallback.requestResponse(jsonObject);
+//                    loggedInCallback.requestResponse(jsonObject);
+                    saveAuthData(jsonObject);
+                    loadTeams();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                JSONObject arr = new JSONObject(new String(responseBody));
                 Log.d("Response", decodedData);
             }
 
@@ -71,9 +75,7 @@ public class AteamoFetcher {
 
             }
         });
-
     }
-
 
 
     private void saveAuthData(JSONObject jsonData) {
@@ -90,5 +92,29 @@ public class AteamoFetcher {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    void loadTeams() {
+        Header[] headers = {new BasicHeader("Authorization", "Bearer " + accessToken)};
+        AteamoRestClient.get(context, teamsUrlString, headers, null, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String decodedData = new String(responseBody);
+                try {
+                    JSONArray jsonArray = new JSONArray(decodedData);
+                    Team.fill(jsonArray);
+                    callback.requestResponse(null);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+        });
     }
 }
