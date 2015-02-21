@@ -1,13 +1,15 @@
 package com.ateamo.ateamo;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -17,14 +19,75 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import java.util.ArrayList;
 
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends FragmentActivity {
+    private final String SCHEDULE_TAB_ID = "schedule";
+    private final String SCHEDULE_TAB_NAME_ID = "Schedule";
+    private final String CHAT_TAB_ID = "chat";
+    private final String CHAT_TAB_NAME_ID = "Chat";
+
+    private SlidingMenu slidingMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initTabs();
         initImageLoader();
         initMenus();
+    }
+
+
+
+    private void initTabs() {
+        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        tabHost.setup();
+        TabHost.OnTabChangeListener tabChangeListener = new TabHost.OnTabChangeListener() {
+
+            @Override
+            public void onTabChanged(String tabId) {
+                android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+                ScheduleFragment scheduleFragment = (ScheduleFragment) fragmentManager.findFragmentByTag(SCHEDULE_TAB_ID);
+                ChatFragment chatFragment = (ChatFragment) fragmentManager.findFragmentByTag(CHAT_TAB_ID);
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                if(scheduleFragment!=null) {
+                    fragmentTransaction.detach(scheduleFragment);
+                }
+
+                if(chatFragment!=null) {
+                    fragmentTransaction.detach(chatFragment);
+                }
+                if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)){
+
+                    if(scheduleFragment == null){
+                        fragmentTransaction.add(R.id.realtabcontent, new ScheduleFragment(), SCHEDULE_TAB_ID);
+                    } else {
+                        fragmentTransaction.attach(scheduleFragment);
+                    }
+
+                } else {
+                    if(chatFragment==null){
+                        fragmentTransaction.add(R.id.realtabcontent, new ChatFragment(), CHAT_TAB_ID);
+                    }else{
+                        fragmentTransaction.attach(chatFragment);
+                    }
+                }
+                fragmentTransaction.commit();
+            }
+        };
+        tabHost.setOnTabChangedListener(tabChangeListener);
+
+        TabHost.TabSpec tSpecAndroid = tabHost.newTabSpec(SCHEDULE_TAB_ID);
+        tSpecAndroid.setIndicator(SCHEDULE_TAB_NAME_ID,getResources().getDrawable(R.drawable.schedule));
+        tSpecAndroid.setContent(new TabContent(getBaseContext()));
+        tabHost.addTab(tSpecAndroid);
+
+        TabHost.TabSpec tSpecApple = tabHost.newTabSpec(CHAT_TAB_ID);
+        tSpecApple.setIndicator(CHAT_TAB_NAME_ID,getResources().getDrawable(R.drawable.chat));
+        tSpecApple.setContent(new TabContent(getBaseContext()));
+        tabHost.addTab(tSpecApple);
+
     }
 
 
@@ -37,17 +100,17 @@ public class MainActivity extends Activity {
 
 
     private void initMenus() {
-        SlidingMenu menu = new SlidingMenu(this);
-        menu.setMode(SlidingMenu.LEFT_RIGHT);
-        menu.setMenu(R.layout.menu_left);
-        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-        menu.setShadowWidthRes(R.dimen.shadow_width);
-        menu.setShadowDrawable(R.drawable.shadow_left);
-        menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-        menu.setFadeDegree(0.35f);
-        menu.setSecondaryMenu(R.layout.menu_right);
-        menu.setSecondaryShadowDrawable(R.drawable.shadow_right);
-        menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        slidingMenu = new SlidingMenu(this);
+        slidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+        slidingMenu.setMenu(R.layout.menu_left);
+        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        slidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+        slidingMenu.setShadowDrawable(R.drawable.shadow_left);
+        slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        slidingMenu.setFadeDegree(0.35f);
+        slidingMenu.setSecondaryMenu(R.layout.menu_right);
+        slidingMenu.setSecondaryShadowDrawable(R.drawable.shadow_right);
+        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         fillMenus();
     }
 
@@ -86,6 +149,19 @@ public class MainActivity extends Activity {
         }
 
     }
+
+
+
+    public void openLeftMenu(View view) {
+        slidingMenu.showMenu();
+    }
+
+
+
+    public void openRightMenu(View view) {
+        slidingMenu.showSecondaryMenu();
+    }
+
 
 
 }
