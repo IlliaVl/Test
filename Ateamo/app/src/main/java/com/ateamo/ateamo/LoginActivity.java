@@ -25,6 +25,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.ateamo.core.AteamoFetcher;
+import com.ateamo.core.CallBack;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;

@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.ateamo.core.Team;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -118,8 +119,8 @@ public class MainActivity extends FragmentActivity {
 
     private void fillMenus() {
         final ListView teamsListview = (ListView) findViewById(R.id.teamsListView);
-        final ArrayList<Team> list = Team.teams;
-        final TeamArrayAdapter adapter = new TeamArrayAdapter(this, R.layout.list_item_team, Team.teams);
+        final ArrayList<Team> list = Team.getTeams();
+        final TeamArrayAdapter adapter = new TeamArrayAdapter(this, R.layout.list_item_team, Team.getTeams());
         teamsListview.setAdapter(adapter);
     }
 
