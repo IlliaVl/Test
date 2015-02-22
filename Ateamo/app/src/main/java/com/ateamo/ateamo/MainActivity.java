@@ -12,10 +12,12 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.ateamo.core.Member;
 import com.ateamo.core.Team;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.quickblox.chat.model.QBChatMessage;
 
 import java.util.ArrayList;
 
@@ -28,7 +30,7 @@ public class MainActivity extends FragmentActivity {
     private final String CHAT_TAB_NAME_ID = "Chat";
 
     private SlidingMenu slidingMenu;
-
+    ChatFragment chatFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,18 +51,17 @@ public class MainActivity extends FragmentActivity {
             public void onTabChanged(String tabId) {
                 android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
                 ScheduleFragment scheduleFragment = (ScheduleFragment) fragmentManager.findFragmentByTag(SCHEDULE_TAB_ID);
-                ChatFragment chatFragment = (ChatFragment) fragmentManager.findFragmentByTag(CHAT_TAB_ID);
+                chatFragment = (ChatFragment) fragmentManager.findFragmentByTag(CHAT_TAB_ID);
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-                if(scheduleFragment!=null) {
+                if(scheduleFragment != null) {
                     fragmentTransaction.detach(scheduleFragment);
                 }
 
-                if(chatFragment!=null) {
+                if(chatFragment != null) {
                     fragmentTransaction.detach(chatFragment);
                 }
-                if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)){
-
+                if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)) {
                     if(scheduleFragment == null){
                         fragmentTransaction.add(R.id.realtabcontent, new ScheduleFragment(), SCHEDULE_TAB_ID);
                     } else {
@@ -68,9 +69,9 @@ public class MainActivity extends FragmentActivity {
                     }
 
                 } else {
-                    if(chatFragment==null){
+                    if(chatFragment == null) {
                         fragmentTransaction.add(R.id.realtabcontent, new ChatFragment(), CHAT_TAB_ID);
-                    }else{
+                    } else {
                         fragmentTransaction.attach(chatFragment);
                     }
                 }
@@ -118,10 +119,17 @@ public class MainActivity extends FragmentActivity {
 
 
     private void fillMenus() {
+        final TextView currentMemberNameTextView = (TextView) findViewById(R.id.currentMemberNameTextView);
+        currentMemberNameTextView.setText(Member.getCurrent().getName());
+        final TextView currentMemberEmailTextView = (TextView) findViewById(R.id.currentMemberEmailTextView);
+        currentMemberEmailTextView.setText(Member.getCurrent().getEmail());
+        final ImageView currentMemberPictureTextView = (ImageView) findViewById(R.id.currentMemberPictureImageView);
+        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), currentMemberPictureTextView);
         final ListView teamsListview = (ListView) findViewById(R.id.teamsListView);
         final ArrayList<Team> list = Team.getTeams();
         final TeamArrayAdapter adapter = new TeamArrayAdapter(this, R.layout.list_item_team, Team.getTeams());
         teamsListview.setAdapter(adapter);
+
     }
 
 
@@ -164,5 +172,9 @@ public class MainActivity extends FragmentActivity {
     }
 
 
-
+    public void showMessage(QBChatMessage message) {
+        if (chatFragment != null) {
+            chatFragment.showMessage(message);
+        }
+    }
 }

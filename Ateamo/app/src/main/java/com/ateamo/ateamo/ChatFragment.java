@@ -1,11 +1,36 @@
 package com.ateamo.ateamo;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.ateamo.adapters.ChatAdapter;
+import com.ateamo.core.GroupChatManagerImpl;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.request.QBRequestGetBuilder;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -17,6 +42,8 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class ChatFragment extends Fragment {
+    private static final String TAG = "CHAT";
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -27,6 +54,23 @@ public class ChatFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    public static final String EXTRA_MODE = "mode";
+    public static final String EXTRA_DIALOG = "dialog";
+    private final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
+
+    private EditText messageEditText;
+    private ListView messagesContainer;
+    private Button sendButton;
+    private ProgressBar progressBar;
+
+    public static enum Mode {PRIVATE, GROUP}
+    private Mode mode = Mode.PRIVATE;
+    private GroupChatManagerImpl chat;
+    private ChatAdapter adapter;
+    private QBDialog dialog;
+
+    private ArrayList<QBChatMessage> history;
 
     /**
      * Use this factory method to create a new instance of
@@ -57,6 +101,142 @@ public class ChatFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        initViews();
+    }
+
+    private void initViews() {
+        messagesContainer = (ListView) getActivity().findViewById(R.id.messagesContainer);
+        messageEditText = (EditText) getActivity().findViewById(R.id.messageEdit);
+        sendButton = (Button) getActivity().findViewById(R.id.chatSendButton);
+
+        TextView meLabel = (TextView) getActivity().findViewById(R.id.meLabel);
+        TextView companionLabel = (TextView) getActivity().findViewById(R.id.companionLabel);
+        RelativeLayout container = (RelativeLayout) getActivity().findViewById(R.id.container);
+        progressBar = (ProgressBar) getActivity().findViewById(R.id.progressBar);
+
+        Intent intent = getActivity().getIntent();
+
+        // Get chat dialog
+        //
+        dialog = (QBDialog)intent.getSerializableExtra(EXTRA_DIALOG);
+
+        mode = (Mode) intent.getSerializableExtra(EXTRA_MODE);
+        switch (mode) {
+            case GROUP:
+                chat = new GroupChatManagerImpl((MainActivity) getActivity());
+                container.removeView(meLabel);
+                container.removeView(companionLabel);
+
+                // Join group chat
+                //                chat = new GroupChatManagerImpl((MainActivity) getActivity());
+
+                progressBar.setVisibility(View.VISIBLE);
+                //
+                ((GroupChatManagerImpl) chat).joinGroupChat(dialog, new QBEntityCallbackImpl() {
+                    @Override
+                    public void onSuccess() {
+
+                        // Load Chat history
+                        //
+                        loadChatHistory();
+                    }
+
+                    @Override
+                    public void onError(List list) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                        dialog.setMessage("error when join group chat: " + list.toString()).create().show();
+                    }
+                });
+
+                break;
+            case PRIVATE:
+//                Integer opponentID = ((ApplicationSingleton)getApplication()).getOpponentIDForPrivateDialog(dialog);
+//
+//                chat = new PrivateChatManagerImpl(this, opponentID);
+//
+//                companionLabel.setText(((ApplicationSingleton)getApplication()).getDialogsUsers().get(opponentID).getLogin());
+//
+//                // Load CHat history
+//                //
+//                loadChatHistory();
+//                break;
+        }
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String messageText = messageEditText.getText().toString();
+                if (TextUtils.isEmpty(messageText)) {
+                    return;
+                }
+
+                // Send chat message
+                //
+                QBChatMessage chatMessage = new QBChatMessage();
+                chatMessage.setBody(messageText);
+                chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, "1");
+                chatMessage.setDateSent(new Date().getTime()/1000);
+
+                try {
+                    chat.sendMessage(chatMessage);
+                } catch (XMPPException e) {
+                    Log.e(TAG, "failed to send a message", e);
+                } catch (SmackException sme){
+                    Log.e(TAG, "failed to send a message", sme);
+                }
+
+                messageEditText.setText("");
+
+                if(mode == Mode.PRIVATE) {
+                    showMessage(chatMessage);
+                }
+            }
+        });
+    }
+
+    private void loadChatHistory(){
+        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
+        customObjectRequestBuilder.setPagesLimit(100);
+        customObjectRequestBuilder.sortDesc("date_sent");
+
+        QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
+            @Override
+            public void onSuccess(ArrayList<QBChatMessage> messages, Bundle args) {
+                history = messages;
+
+                adapter = new ChatAdapter(getActivity(), new ArrayList<QBChatMessage>());
+                messagesContainer.setAdapter(adapter);
+
+                for (int i = messages.size() - 1; i >= 0; --i) {
+                    QBChatMessage msg = messages.get(i);
+                    showMessage(msg);
+                }
+
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(List<String> errors) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                dialog.setMessage("load chat history errors: " + errors).create().show();
+            }
+        });
+    }
+
+    public void showMessage(QBChatMessage message) {
+        adapter.add(message);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+                scrollDown();
+            }
+        });
+    }
+
+    private void scrollDown() {
+        messagesContainer.setSelection(messagesContainer.getCount() - 1);
     }
 
     @Override

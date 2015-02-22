@@ -57,7 +57,7 @@
         <ImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:id="@+id/imageView2"
+            android:id="@+id/currentMemberPictureImageView"
             android:background="#ffff4f76" />
 
         <LinearLayout
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Eric Stratton"
-                android:id="@+id/textView"
+                android:id="@+id/currentMemberNameTextView"
                 android:textColor="#ffffffff"
                 android:textStyle="bold"
                 android:paddingTop="10dp" />
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="eric.stratton@ateamo.com"
-                android:id="@+id/textView2"
+                android:id="@+id/currentMemberEmailTextView"
                 android:textColor="#ffffffff" />
         </LinearLayout>
 

@@ -17,26 +17,34 @@ import java.util.ArrayList;
 public class Member {
     private static final String HASH_ID = "hash";
     private static final String NAME_ID = "name";
+    private static final String EMAIL_ID = "email";
     private static final String PROFILE_PICTURE_ID = "img";
 
     private static ArrayList<Member> members = new ArrayList<Member>();
     private static Member current = new Member();
 
+    private static Context context;
+
     private String hash;
     private String name;
+    private String email;
     private String profilePictureURL;
 
 
     public Member() {
+        hash = "c02e33a07f2811e4b5c1001851012600";
+        name = "Illia Vlasov";
+        email = "iliavl@list.ru";
+        profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/397ff121-ab0c-379b-44edef72e85eb137.jpg";
     }
 
 
 
-    Member(JSONObject teamJSONObject) {
+    Member(JSONObject memberJSONObject) {
         try {
-            hash = teamJSONObject.getString(HASH_ID);
-            name = teamJSONObject.getString(NAME_ID);
-            profilePictureURL = teamJSONObject.getString(PROFILE_PICTURE_ID);
+            hash = memberJSONObject.getString(HASH_ID);
+            name = memberJSONObject.getString(NAME_ID);
+            profilePictureURL = memberJSONObject.getString(PROFILE_PICTURE_ID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -58,18 +66,50 @@ public class Member {
 
 
     static public void initCurrentMember(Context context) {
+        Member.context = context;
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         current.hash = sharedPref.getString(HASH_ID, null);
         if (current.hash != null) {
             current.name = sharedPref.getString(NAME_ID, null);
+            current.email = sharedPref.getString(EMAIL_ID, null);
             current.profilePictureURL = sharedPref.getString(PROFILE_PICTURE_ID, null);
         }
     }
 
 
 
+    static private void saveCurrentMember() {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(HASH_ID, current.hash);
+        editor.putString(NAME_ID, current.name);
+        editor.putString(EMAIL_ID, current.email);
+        editor.putString(PROFILE_PICTURE_ID, current.profilePictureURL);
+        editor.commit();
+
+    }
+
+
+
     public String getHash() {
         return hash;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getProfilePictureURL() {
+        return profilePictureURL;
+    }
+
+    public static void setCurrent(Member current) {
+        Member.current = current;
+        saveCurrentMember();
     }
 
     public static Member getCurrent() {

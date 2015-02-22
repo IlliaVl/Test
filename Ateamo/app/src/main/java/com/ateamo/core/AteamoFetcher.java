@@ -59,6 +59,7 @@ public class AteamoFetcher {
                     JSONObject jsonObject = new JSONObject(decodedData);
 //                    loggedInCallback.requestResponse(jsonObject);
                     saveAuthData(jsonObject);
+                    Member.setCurrent(new Member());
                     loadTeams();
                 } catch (JSONException e) {
                     e.printStackTrace();

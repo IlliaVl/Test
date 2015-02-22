@@ -7,12 +7,15 @@ import android.os.Bundle;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBSettings;
+import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,6 +70,7 @@ public class QuickbloxHelper {
     }
 
 
+
     public void login() {
         if (loggingInProcess || loggedIn || Member.getCurrent().getHash() == null) {
             return;
@@ -118,6 +122,26 @@ public class QuickbloxHelper {
             public void onError(List errors) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 dialog.setMessage("chat login errors: " + errors).create().show();
+            }
+        });
+    }
+
+
+
+    public void loginToCurrentTeamChat() {
+        QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
+//        requestBuilder.addParameter("name", Team.getCurrent().getHash());
+        requestBuilder.addParameter("name", "daad19a87f2811e4b5c1001851012600");
+
+        QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
+            @Override
+            public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
+
+            }
+
+            @Override
+            public void onError(List<String> errors) {
+
             }
         });
     }

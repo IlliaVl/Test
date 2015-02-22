@@ -15,6 +15,7 @@ public class Team {
     private static final String BADGE_URL_ID = "grp_badge";
 
     private static ArrayList<Team> teams = new ArrayList<Team>();
+    private static Team current;
 
     private String hash;
     private String name;
@@ -43,6 +44,9 @@ public class Team {
                 e.printStackTrace();
             }
         }
+        if (teams.size() > 0) {
+            setCurrent(teams.get(0));
+        }
     }
 
 
@@ -60,5 +64,14 @@ public class Team {
 
     public static ArrayList<Team> getTeams() {
         return teams;
+    }
+
+    public static void setCurrent(Team current) {
+        Team.current = current;
+        QuickbloxHelper.getSharedInstance().loginToCurrentTeamChat();
+    }
+
+    public static Team getCurrent() {
+        return current;
     }
 }
