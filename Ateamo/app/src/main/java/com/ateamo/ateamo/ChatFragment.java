@@ -20,7 +20,6 @@ import com.ateamo.adapters.ChatAdapter;
 import com.ateamo.core.QBHelper;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatMessage;
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.request.QBRequestGetBuilder;
 
@@ -67,7 +66,6 @@ public class ChatFragment extends Fragment {
     private Mode mode = Mode.PRIVATE;
     private QBHelper qbHelper;
     private ChatAdapter adapter;
-    private QBDialog dialog;
 
     private ArrayList<QBChatMessage> history;
 
@@ -102,6 +100,8 @@ public class ChatFragment extends Fragment {
         }
     }
 
+
+
     private void initViews(View view) {
         messagesContainer = (ListView) view.findViewById(R.id.messagesContainer);
         messageEditText = (EditText) view.findViewById(R.id.messageEdit);
@@ -113,36 +113,16 @@ public class ChatFragment extends Fragment {
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         qbHelper = QBHelper.getSharedInstance();
-        dialog = qbHelper.getCurrentDialog();
         container.removeView(meLabel);
         container.removeView(companionLabel);
 
-        // Join group chat
-        //                qbHelper = new GroupChatManagerImpl((MainActivity) getActivity());
-
         progressBar.setVisibility(View.VISIBLE);
-        //
-        qbHelper.joinGroupChat((MainActivity) getActivity(), new QBEntityCallbackImpl() {
-            @Override
-            public void onSuccess() {
-
-                // Load Chat history
-                //
-                loadChatHistory();
-            }
-
-            @Override
-            public void onError(List list) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                dialog.setMessage("error when join group chat: " + list.toString()).create().show();
-            }
-        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String messageText = messageEditText.getText().toString();
-                if (TextUtils.isEmpty(messageText)) {
+                if (TextUtils.isEmpty(messageText) || qbHelper.getCurrentDialog() == null) {
                     return;
                 }
 
@@ -168,14 +148,37 @@ public class ChatFragment extends Fragment {
                 }
             }
         });
+        joinGroupChat();
     }
+
+
+
+    public void joinGroupChat() {
+        if (qbHelper.getCurrentDialog() == null) {
+            return;
+        }
+        qbHelper.joinGroupChat(new QBEntityCallbackImpl() {
+            @Override
+            public void onSuccess() {
+                loadChatHistory();
+            }
+
+            @Override
+            public void onError(List list) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                dialog.setMessage("error when join group chat: " + list.toString()).create().show();
+            }
+        });
+    }
+
+
 
     private void loadChatHistory(){
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesLimit(100);
         customObjectRequestBuilder.sortDesc("date_sent");
 
-        QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
+        QBChatService.getDialogMessages(qbHelper.getCurrentDialog(), customObjectRequestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> messages, Bundle args) {
                 history = messages;

@@ -13,6 +13,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.ateamo.core.Member;
+import com.ateamo.core.QBHelper;
 import com.ateamo.core.Team;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -24,13 +25,17 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends FragmentActivity {
+    private final int SCHEDULE_TAB_NUMBER = 0;
+    private final int CHAT_TAB_NUMBER = 1;
+
     private final String SCHEDULE_TAB_ID = "schedule";
     private final String SCHEDULE_TAB_NAME_ID = "Schedule";
     private final String CHAT_TAB_ID = "chat";
     private final String CHAT_TAB_NAME_ID = "Chat";
 
     private SlidingMenu slidingMenu;
-    ChatFragment chatFragment;
+    private ChatFragment chatFragment;
+    private TabHost tabHost;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,12 +43,13 @@ public class MainActivity extends FragmentActivity {
         initTabs();
         initImageLoader();
         initMenus();
+        QBHelper.getSharedInstance().setMainActivity(this);
     }
 
 
 
     private void initTabs() {
-        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
         TabHost.OnTabChangeListener tabChangeListener = new TabHost.OnTabChangeListener() {
 
@@ -70,7 +76,8 @@ public class MainActivity extends FragmentActivity {
 
                 } else {
                     if(chatFragment == null) {
-                        fragmentTransaction.add(R.id.realtabcontent, new ChatFragment(), CHAT_TAB_ID);
+                        chatFragment = new ChatFragment();
+                        fragmentTransaction.add(R.id.realtabcontent, chatFragment, CHAT_TAB_ID);
                     } else {
                         fragmentTransaction.attach(chatFragment);
                     }
@@ -159,6 +166,13 @@ public class MainActivity extends FragmentActivity {
 
     }
 
+
+
+    public void refreshChat() {
+        if (tabHost.getCurrentTab() == CHAT_TAB_NUMBER && chatFragment != null) {
+            chatFragment.joinGroupChat();
+        }
+    }
 
 
     public void openLeftMenu(View view) {
