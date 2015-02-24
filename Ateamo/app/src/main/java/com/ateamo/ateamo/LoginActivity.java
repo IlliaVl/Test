@@ -99,7 +99,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     public void attemptLoginFake() {
         showProgress(true);
-        AteamoFetcher.sharedInstance.login(this, "", "", new CallBack() {
+        AteamoFetcher.getSharedInstance().login(this, "", "", new CallBack() {
             @Override
             public void requestResponse(JSONObject response) {
                 showProgress(false);
@@ -156,7 +156,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            AteamoFetcher.sharedInstance.login(this, email, password, new CallBack() {
+            AteamoFetcher.getSharedInstance().login(this, email, password, new CallBack() {
                 @Override
                 public void requestResponse(JSONObject response) {
                     showProgress(false);

@@ -1,7 +1,6 @@
 package com.ateamo.ateamo;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ateamo.adapters.ChatAdapter;
-import com.ateamo.core.GroupChatManagerImpl;
+import com.ateamo.core.QBHelper;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -66,7 +65,7 @@ public class ChatFragment extends Fragment {
 
     public static enum Mode {PRIVATE, GROUP}
     private Mode mode = Mode.PRIVATE;
-    private GroupChatManagerImpl chat;
+    private QBHelper qbHelper;
     private ChatAdapter adapter;
     private QBDialog dialog;
 
@@ -101,66 +100,43 @@ public class ChatFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        initViews();
     }
 
-    private void initViews() {
-        messagesContainer = (ListView) getActivity().findViewById(R.id.messagesContainer);
-        messageEditText = (EditText) getActivity().findViewById(R.id.messageEdit);
-        sendButton = (Button) getActivity().findViewById(R.id.chatSendButton);
+    private void initViews(View view) {
+        messagesContainer = (ListView) view.findViewById(R.id.messagesContainer);
+        messageEditText = (EditText) view.findViewById(R.id.messageEdit);
+        sendButton = (Button) view.findViewById(R.id.chatSendButton);
 
-        TextView meLabel = (TextView) getActivity().findViewById(R.id.meLabel);
-        TextView companionLabel = (TextView) getActivity().findViewById(R.id.companionLabel);
-        RelativeLayout container = (RelativeLayout) getActivity().findViewById(R.id.container);
-        progressBar = (ProgressBar) getActivity().findViewById(R.id.progressBar);
+        TextView meLabel = (TextView) view.findViewById(R.id.meLabel);
+        TextView companionLabel = (TextView) view.findViewById(R.id.companionLabel);
+        RelativeLayout container = (RelativeLayout) view.findViewById(R.id.container);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        Intent intent = getActivity().getIntent();
+        qbHelper = QBHelper.getSharedInstance();
+        dialog = qbHelper.getCurrentDialog();
+        container.removeView(meLabel);
+        container.removeView(companionLabel);
 
-        // Get chat dialog
+        // Join group chat
+        //                qbHelper = new GroupChatManagerImpl((MainActivity) getActivity());
+
+        progressBar.setVisibility(View.VISIBLE);
         //
-        dialog = (QBDialog)intent.getSerializableExtra(EXTRA_DIALOG);
+        qbHelper.joinGroupChat((MainActivity) getActivity(), new QBEntityCallbackImpl() {
+            @Override
+            public void onSuccess() {
 
-        mode = (Mode) intent.getSerializableExtra(EXTRA_MODE);
-        switch (mode) {
-            case GROUP:
-                chat = new GroupChatManagerImpl((MainActivity) getActivity());
-                container.removeView(meLabel);
-                container.removeView(companionLabel);
-
-                // Join group chat
-                //                chat = new GroupChatManagerImpl((MainActivity) getActivity());
-
-                progressBar.setVisibility(View.VISIBLE);
+                // Load Chat history
                 //
-                ((GroupChatManagerImpl) chat).joinGroupChat(dialog, new QBEntityCallbackImpl() {
-                    @Override
-                    public void onSuccess() {
+                loadChatHistory();
+            }
 
-                        // Load Chat history
-                        //
-                        loadChatHistory();
-                    }
-
-                    @Override
-                    public void onError(List list) {
-                        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                        dialog.setMessage("error when join group chat: " + list.toString()).create().show();
-                    }
-                });
-
-                break;
-            case PRIVATE:
-//                Integer opponentID = ((ApplicationSingleton)getApplication()).getOpponentIDForPrivateDialog(dialog);
-//
-//                chat = new PrivateChatManagerImpl(this, opponentID);
-//
-//                companionLabel.setText(((ApplicationSingleton)getApplication()).getDialogsUsers().get(opponentID).getLogin());
-//
-//                // Load CHat history
-//                //
-//                loadChatHistory();
-//                break;
-        }
+            @Override
+            public void onError(List list) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                dialog.setMessage("error when join group chat: " + list.toString()).create().show();
+            }
+        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,7 +154,7 @@ public class ChatFragment extends Fragment {
                 chatMessage.setDateSent(new Date().getTime()/1000);
 
                 try {
-                    chat.sendMessage(chatMessage);
+                    qbHelper.sendMessage(chatMessage);
                 } catch (XMPPException e) {
                     Log.e(TAG, "failed to send a message", e);
                 } catch (SmackException sme){
@@ -242,8 +218,9 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        initViews(view);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -68,7 +68,7 @@ public class Team {
 
     public static void setCurrent(Team current) {
         Team.current = current;
-        QuickbloxHelper.getSharedInstance().loginToCurrentTeamChat();
+        QBHelper.getSharedInstance().loginToCurrentTeamChat();
     }
 
     public static Team getCurrent() {

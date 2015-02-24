@@ -21,7 +21,7 @@ public class Member {
     private static final String PROFILE_PICTURE_ID = "img";
 
     private static ArrayList<Member> members = new ArrayList<Member>();
-    private static Member current = new Member();
+    private static Member current;
 
     private static Context context;
 
@@ -36,6 +36,14 @@ public class Member {
         name = "Illia Vlasov";
         email = "iliavl@list.ru";
         profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/397ff121-ab0c-379b-44edef72e85eb137.jpg";
+    }
+
+
+    public Member(String hash, String name, String email, String profilePictureURL) {
+        this.hash = hash;
+        this.name = name;
+        this.email = email;
+        this.profilePictureURL = profilePictureURL;
     }
 
 
@@ -68,11 +76,8 @@ public class Member {
     static public void initCurrentMember(Context context) {
         Member.context = context;
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        current.hash = sharedPref.getString(HASH_ID, null);
-        if (current.hash != null) {
-            current.name = sharedPref.getString(NAME_ID, null);
-            current.email = sharedPref.getString(EMAIL_ID, null);
-            current.profilePictureURL = sharedPref.getString(PROFILE_PICTURE_ID, null);
+        if (sharedPref.getString(HASH_ID, null) != null) {
+            setCurrent(new Member(sharedPref.getString(HASH_ID, null), sharedPref.getString(NAME_ID, null), sharedPref.getString(EMAIL_ID, null), sharedPref.getString(PROFILE_PICTURE_ID, null)));
         }
     }
 
@@ -110,6 +115,8 @@ public class Member {
     public static void setCurrent(Member current) {
         Member.current = current;
         saveCurrentMember();
+        AteamoFetcher.getSharedInstance().loadTeams();
+        QBHelper.getSharedInstance().login();
     }
 
     public static Member getCurrent() {

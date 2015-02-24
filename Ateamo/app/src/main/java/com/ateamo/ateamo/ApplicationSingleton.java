@@ -2,8 +2,9 @@ package com.ateamo.ateamo;
 
 import android.app.Application;
 
+import com.ateamo.core.AteamoFetcher;
 import com.ateamo.core.Member;
-import com.ateamo.core.QuickbloxHelper;
+import com.ateamo.core.QBHelper;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.users.model.QBUser;
 
@@ -20,10 +21,9 @@ public class ApplicationSingleton extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        QBHelper.getSharedInstance().init(this);
+        AteamoFetcher.getSharedInstance().init(this);
         Member.initCurrentMember(this);
-        QuickbloxHelper quickbloxHelper = QuickbloxHelper.getSharedInstance();
-        quickbloxHelper.init(this);
-        quickbloxHelper.login();
     }
 
 

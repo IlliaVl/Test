@@ -11,8 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.ateamo.ateamo.ApplicationSingleton;
 import com.ateamo.ateamo.R;
+import com.ateamo.core.QBHelper;
 import com.ateamo.utils.TimeUtils;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.users.model.QBUser;
@@ -66,7 +66,7 @@ public class ChatAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        QBUser currentUser = ((ApplicationSingleton)context.getApplication()).getCurrentUser();
+        QBUser currentUser = QBHelper.getSharedInstance().getCurrentUser();
         boolean isOutgoing = chatMessage.getSenderId() == null || chatMessage.getSenderId().equals(currentUser.getId());
         setAlignment(holder, isOutgoing);
         holder.txtMessage.setText(chatMessage.getBody());

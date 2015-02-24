@@ -13,7 +13,7 @@ public class LaunchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent;
-        if (Member.getCurrent().getHash() == null) {
+        if (Member.getCurrent() == null) {
             intent = new Intent(this, LoginActivity.class);
         } else {
             intent = new Intent(this, MainActivity.class);

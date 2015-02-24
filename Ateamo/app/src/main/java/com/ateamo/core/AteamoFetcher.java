@@ -19,7 +19,7 @@ import org.json.JSONObject;
  */
 public class AteamoFetcher {
 
-    public static final AteamoFetcher sharedInstance = new AteamoFetcher();
+    private static final AteamoFetcher sharedInstance = new AteamoFetcher();
 
     static final String baseUrlString = "https://api.ateamo.com";
     static final String authUrlString = "/oauth/token";
@@ -38,6 +38,19 @@ public class AteamoFetcher {
     private String refreshToken = "";
 
     private CallBack callback;
+
+
+
+    public void init(Context context) {
+        this.context = context;
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        accessToken = sharedPref.getString(ACCESS_TOKEN_FIELD_ID, null);
+        if (accessToken != null) {
+            expiresIn = sharedPref.getInt(EXPIRES_IN_FIELD_ID, 0);
+            refreshToken = sharedPref.getString(REFRESH_TOKEN_FIELD_ID, null);
+        }
+    }
+
 
 
     public void login(Context context, String username, String password, final CallBack loggedInCallback) {
@@ -60,7 +73,6 @@ public class AteamoFetcher {
 //                    loggedInCallback.requestResponse(jsonObject);
                     saveAuthData(jsonObject);
                     Member.setCurrent(new Member());
-                    loadTeams();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -94,7 +106,7 @@ public class AteamoFetcher {
 
 
 
-    void loadTeams() {
+    public void loadTeams() {
         Header[] headers = {new BasicHeader("Authorization", "Bearer " + accessToken)};
         AteamoRestClient.get(context, teamsUrlString, headers, null, new AsyncHttpResponseHandler() {
             @Override
@@ -103,7 +115,9 @@ public class AteamoFetcher {
                 try {
                     JSONArray jsonArray = new JSONArray(decodedData);
                     Team.fill(jsonArray);
-                    callback.requestResponse(null);
+                    if (callback != null) {
+                        callback.requestResponse(null);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -114,5 +128,9 @@ public class AteamoFetcher {
 
             }
         });
+    }
+
+    public static AteamoFetcher getSharedInstance() {
+        return sharedInstance;
     }
 }
