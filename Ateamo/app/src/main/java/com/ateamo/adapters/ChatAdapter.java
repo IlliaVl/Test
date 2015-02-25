@@ -2,18 +2,20 @@ package com.ateamo.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ateamo.ateamo.R;
+import com.ateamo.core.Member;
 import com.ateamo.core.QBHelper;
 import com.ateamo.utils.TimeUtils;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.users.model.QBUser;
 
@@ -69,13 +71,10 @@ public class ChatAdapter extends BaseAdapter {
         QBUser currentUser = QBHelper.getSharedInstance().getCurrentUser();
         boolean isOutgoing = chatMessage.getSenderId() == null || chatMessage.getSenderId().equals(currentUser.getId());
         setAlignment(holder, isOutgoing);
-        holder.txtMessage.setText(chatMessage.getBody());
-        if (chatMessage.getSenderId() != null) {
-            holder.txtInfo.setText(chatMessage.getSenderId() + ": " + getTimeText(chatMessage));
-        } else {
-            holder.txtInfo.setText(getTimeText(chatMessage));
-        }
-
+        holder.messageTextView.setText(chatMessage.getBody());
+        holder.dateTextView.setText(getTimeText(chatMessage));
+        holder.nameTextView.setText(chatMessage.getSenderId().toString());
+        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), holder.iconImageView);
         return convertView;
     }
 
@@ -88,51 +87,37 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     private void setAlignment(ViewHolder holder, boolean isOutgoing) {
-        if (!isOutgoing) {
-            holder.contentWithBG.setBackgroundResource(R.drawable.incoming_message_bg);
-
-            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.contentWithBG.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            holder.contentWithBG.setLayoutParams(layoutParams);
-
-            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
-            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+        holder.itemContentLinearLayout.removeAllViews();
+        if (isOutgoing) {
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
             lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            holder.content.setLayoutParams(lp);
-            layoutParams = (LinearLayout.LayoutParams) holder.txtMessage.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            holder.txtMessage.setLayoutParams(layoutParams);
+            holder.itemContentLinearLayout.setLayoutParams(lp);
 
-            layoutParams = (LinearLayout.LayoutParams) holder.txtInfo.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            holder.txtInfo.setLayoutParams(layoutParams);
+            holder.messageLinearLayout.setBackgroundResource(R.drawable.right_bubble_bg);
+            holder.itemContentLinearLayout.addView(holder.messageDateLinearLayout);
+            holder.itemContentLinearLayout.addView(holder.iconNameLinearLayout);
         } else {
-            holder.contentWithBG.setBackgroundResource(R.drawable.outgoing_message_bg);
-
-            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.contentWithBG.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            holder.contentWithBG.setLayoutParams(layoutParams);
-
-            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.content.getLayoutParams();
-            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
             lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            holder.content.setLayoutParams(lp);
-            layoutParams = (LinearLayout.LayoutParams) holder.txtMessage.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            holder.txtMessage.setLayoutParams(layoutParams);
+            holder.itemContentLinearLayout.setLayoutParams(lp);
 
-            layoutParams = (LinearLayout.LayoutParams) holder.txtInfo.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            holder.txtInfo.setLayoutParams(layoutParams);
+            holder.messageLinearLayout.setBackgroundResource(R.drawable.left_bubble_bg);
+            holder.itemContentLinearLayout.addView(holder.iconNameLinearLayout);
+            holder.itemContentLinearLayout.addView(holder.messageDateLinearLayout);
         }
     }
 
     private ViewHolder createViewHolder(View v) {
         ViewHolder holder = new ViewHolder();
-        holder.txtMessage = (TextView) v.findViewById(R.id.txtMessage);
-        holder.content = (LinearLayout) v.findViewById(R.id.content);
-        holder.contentWithBG = (LinearLayout) v.findViewById(R.id.contentWithBackground);
-        holder.txtInfo = (TextView) v.findViewById(R.id.txtInfo);
+        holder.itemContentRelativeLayout = (RelativeLayout) v.findViewById(R.id.itemContentRelativeLayout);
+        holder.messageTextView = (TextView) v.findViewById(R.id.messageTextView);
+        holder.itemContentLinearLayout = (LinearLayout) v.findViewById(R.id.content);
+        holder.messageLinearLayout = (LinearLayout) v.findViewById(R.id.messageLinearLayout);
+        holder.iconNameLinearLayout = (LinearLayout) v.findViewById(R.id.iconNameLinearLayout);
+        holder.messageDateLinearLayout = (LinearLayout) v.findViewById(R.id.messageDateLinearLayout);
+        holder.dateTextView = (TextView) v.findViewById(R.id.dateTextView);
+        holder.nameTextView = (TextView) v.findViewById(R.id.nameTextView);
+        holder.iconImageView = (ImageView) v.findViewById(R.id.iconImageView);
         return holder;
     }
 
@@ -141,9 +126,14 @@ public class ChatAdapter extends BaseAdapter {
     }
 
     private static class ViewHolder {
-        public TextView txtMessage;
-        public TextView txtInfo;
-        public LinearLayout content;
-        public LinearLayout contentWithBG;
+        public ImageView iconImageView;
+        public TextView messageTextView;
+        public TextView dateTextView;
+        public TextView nameTextView;
+        public LinearLayout itemContentLinearLayout;
+        public LinearLayout messageLinearLayout;
+        public LinearLayout iconNameLinearLayout;
+        public LinearLayout messageDateLinearLayout;
+        public RelativeLayout itemContentRelativeLayout;
     }
 }

@@ -14,22 +14,36 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <Button
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:id="@+id/attachmentButton"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/chat_attachment_button" />
+
             <EditText
                 android:id="@+id/messageEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_toLeftOf="@+id/chatSendButton"
                 android:autoText="true"
-                android:hint="message text" />
+                android:hint="message text"
+                android:background="@drawable/text_view_background"
+                android:layout_alignTop="@+id/attachmentButton"
+                android:layout_toRightOf="@+id/attachmentButton"
+                android:layout_toLeftOf="@+id/chatSendButton"
+                android:layout_toStartOf="@+id/chatSendButton"
+                android:layout_alignParentBottom="true" />
 
             <Button
                 android:id="@+id/chatSendButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="68dp"
+                android:layout_height="34dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
-                android:text="Send" />
+                android:background="@drawable/send_button"
+                android:layout_alignParentEnd="true" />
 
             <ListView
                 android:id="@+id/messagesContainer"

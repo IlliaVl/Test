@@ -2,41 +2,85 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/itemContentRelativeLayout">
 
     <LinearLayout
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txtInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="20sp"
-            android:layout_gravity="right"
-            android:textSize="10sp"
-            android:textColor="@android:color/secondary_text_dark" />
+        android:orientation="horizontal"
+        android:layout_alignParentLeft="false">
 
         <LinearLayout
-            android:id="@+id/contentWithBackground"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:background="@drawable/incoming_message_bg"
-            android:paddingLeft="10dp"
-            android:paddingBottom="10dp"
-            android:orientation="vertical">
+            android:id="@+id/messageDateLinearLayout">
 
-            <TextView
-                android:id="@+id/txtMessage"
+            <LinearLayout
+                android:id="@+id/messageLinearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:maxWidth="250dp" />
+                android:layout_gravity="right"
+                android:background="@drawable/right_bubble_bg"
+                android:paddingLeft="10dp"
+                android:paddingBottom="10dp"
+                android:orientation="vertical"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/content"
+                android:layout_toStartOf="@+id/content">
 
+                <TextView
+                    android:id="@+id/messageTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:maxWidth="250dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/dateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="20sp"
+                android:textSize="10sp"
+                android:textColor="@android:color/secondary_text_dark"
+                android:text="HHHHHHHH"
+                android:layout_gravity="left" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/content"
+            android:layout_toEndOf="@+id/content"
+            android:id="@+id/iconNameLinearLayout">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/iconImageView"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:background="#ff382cff" />
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="20sp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/nameTextView"
+                android:textSize="10sp"
+                android:layout_below="@+id/content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
         </LinearLayout>
 
     </LinearLayout>
+
 </RelativeLayout>
