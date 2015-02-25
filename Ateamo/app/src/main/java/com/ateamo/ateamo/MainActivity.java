@@ -1,19 +1,17 @@
 package com.ateamo.ateamo;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.ateamo.adapters.MembersAdapter;
+import com.ateamo.adapters.TeamsAdapter;
 import com.ateamo.core.Member;
-import com.ateamo.core.QBHelper;
 import com.ateamo.core.Team;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -25,6 +23,8 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends FragmentActivity {
+    private static MainActivity instance = null;
+
     private final int SCHEDULE_TAB_NUMBER = 0;
     private final int CHAT_TAB_NUMBER = 1;
 
@@ -39,11 +39,11 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
         setContentView(R.layout.activity_main);
         initTabs();
         initImageLoader();
         initMenus();
-        QBHelper.getSharedInstance().setMainActivity(this);
     }
 
 
@@ -126,44 +126,38 @@ public class MainActivity extends FragmentActivity {
 
 
     private void fillMenus() {
-        final TextView currentMemberNameTextView = (TextView) findViewById(R.id.currentMemberNameTextView);
-        currentMemberNameTextView.setText(Member.getCurrent().getName());
-        final TextView currentMemberEmailTextView = (TextView) findViewById(R.id.currentMemberEmailTextView);
-        currentMemberEmailTextView.setText(Member.getCurrent().getEmail());
-        final ImageView currentMemberPictureTextView = (ImageView) findViewById(R.id.currentMemberPictureImageView);
-        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), currentMemberPictureTextView);
-        final ListView teamsListview = (ListView) findViewById(R.id.teamsListView);
-        final ArrayList<Team> list = Team.getTeams();
-        final TeamArrayAdapter adapter = new TeamArrayAdapter(this, R.layout.list_item_team, Team.getTeams());
-        teamsListview.setAdapter(adapter);
-
+        fillLeftMenu();
+        fillRightMenu();
     }
 
 
 
-    private class TeamArrayAdapter extends ArrayAdapter<Team> {
+    public void fillLeftMenu() {
+        final ImageView currentMemberPictureImageView = (ImageView) findViewById(R.id.currentMemberPictureImageView);
+        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), currentMemberPictureImageView);
+        final TextView currentMemberNameTextView = (TextView) findViewById(R.id.currentMemberNameTextView);
+        currentMemberNameTextView.setText(Member.getCurrent().getName());
+        final ListView teamsListView = (ListView) findViewById(R.id.teamsListView);
+        final ArrayList<Team> list = Team.getTeams();
+        final TeamsAdapter adapter = new TeamsAdapter(this, R.layout.list_item_team, Team.getTeams());
+        teamsListView.setAdapter(adapter);
+    }
 
-        public TeamArrayAdapter(Context context, int resource, ArrayList<Team> objects) {
-            super(context, resource, objects);
+
+
+    public void fillRightMenu() {
+        if (Team.getCurrent() != null) {
+            final ImageView currentTeamBadgeImageView = (ImageView) findViewById(R.id.currentTeamBadgeImageView);
+            ImageLoader.getInstance().displayImage(Team.getCurrent().getBadgeURL(), currentTeamBadgeImageView);
+            final TextView currentTeamTextView = (TextView) findViewById(R.id.currentTeamTextView);
+            currentTeamTextView.setText(Team.getCurrent().getName());
         }
-
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.list_item_team, parent, false);
-            }
-            Team team = getItem(position);
-
-            TextView teamNameTextView = (TextView)convertView.findViewById(R.id.teamNameTextView);
-            teamNameTextView.setText(team.getName());
-
-            ImageView teamBadgeImageView = (ImageView)convertView.findViewById(R.id.teamBadgeImageView);
-            ImageLoader.getInstance().displayImage(team.getBadgeURL(), teamBadgeImageView);
-
-            return convertView;
-        }
-
+        final TextView membersNumberTextView = (TextView) findViewById(R.id.membersNumberTextView);
+        membersNumberTextView.setText("Players(" + Integer.toString(Member.getMembers().size()) + ")");
+        final ListView membersListview = (ListView) findViewById(R.id.membersListView);
+        final ArrayList<Member> list = Member.getMembers();
+        final MembersAdapter adapter = new MembersAdapter(this, R.layout.list_item_team_member, Member.getMembers());
+        membersListview.setAdapter(adapter);
     }
 
 
@@ -173,6 +167,7 @@ public class MainActivity extends FragmentActivity {
             chatFragment.joinGroupChat();
         }
     }
+
 
 
     public void openLeftMenu(View view) {
@@ -186,9 +181,14 @@ public class MainActivity extends FragmentActivity {
     }
 
 
+
     public void showMessage(QBChatMessage message) {
         if (chatFragment != null) {
             chatFragment.showMessage(message);
         }
+    }
+
+    public static MainActivity getInstance() {
+        return instance;
     }
 }

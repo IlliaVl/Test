@@ -76,12 +76,14 @@
                 android:layout_width="50dp"
                 android:layout_height="20sp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Small Text"
+                android:text="Sm Text"
                 android:id="@+id/nameTextView"
                 android:textSize="10sp"
                 android:layout_below="@+id/content"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true"
+                android:textAlignment="center"
+                android:singleLine="true" />
         </LinearLayout>
 
     </LinearLayout>

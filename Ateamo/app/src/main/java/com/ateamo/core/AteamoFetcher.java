@@ -2,6 +2,7 @@ package com.ateamo.core;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.ateamo.ateamo.R;
@@ -128,6 +129,32 @@ public class AteamoFetcher {
 
             }
         });
+    }
+
+
+
+    public void loadMembers() {
+        new PostTask().execute("");
+    }
+
+
+
+    private class PostTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "All done";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Member.fillTest();
+        }
     }
 
     public static AteamoFetcher getSharedInstance() {

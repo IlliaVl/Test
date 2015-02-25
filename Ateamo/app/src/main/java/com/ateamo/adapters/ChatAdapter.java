@@ -92,18 +92,58 @@ public class ChatAdapter extends BaseAdapter {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
             lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             holder.itemContentLinearLayout.setLayoutParams(lp);
+//            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
+//            layoutParams.gravity = Gravity.RIGHT;
+//            holder.itemContentLinearLayout.setLayoutParams(layoutParams);
 
             holder.messageLinearLayout.setBackgroundResource(R.drawable.right_bubble_bg);
             holder.itemContentLinearLayout.addView(holder.messageDateLinearLayout);
             holder.itemContentLinearLayout.addView(holder.iconNameLinearLayout);
+
+//            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.messageDateLinearLayout.getLayoutParams();
+//            layoutParams.gravity = Gravity.RIGHT;
+//            holder.messageDateLinearLayout.setLayoutParams(layoutParams);
+//            layoutParams = (LinearLayout.LayoutParams) holder.iconNameLinearLayout.getLayoutParams();
+//            layoutParams.gravity = Gravity.RIGHT;
+//            holder.iconNameLinearLayout.setLayoutParams(layoutParams);
         } else {
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
             lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
             holder.itemContentLinearLayout.setLayoutParams(lp);
+//            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
+//            layoutParams.gravity = Gravity.LEFT;
+//            holder.itemContentLinearLayout.setLayoutParams(layoutParams);
+//            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
+//            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+//            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+//            holder.itemContentLinearLayout.setLayoutParams(lp);
 
             holder.messageLinearLayout.setBackgroundResource(R.drawable.left_bubble_bg);
             holder.itemContentLinearLayout.addView(holder.iconNameLinearLayout);
             holder.itemContentLinearLayout.addView(holder.messageDateLinearLayout);
+
+//            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.iconNameLinearLayout.getLayoutParams();
+//            layoutParams.gravity = Gravity.LEFT;
+//            holder.iconNameLinearLayout.setLayoutParams(layoutParams);
+//            layoutParams = (LinearLayout.LayoutParams) holder.messageDateLinearLayout.getLayoutParams();
+//            layoutParams.gravity = Gravity.LEFT;
+//            holder.messageDateLinearLayout.setLayoutParams(layoutParams);
+//
+//            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.messageLinearLayout.getLayoutParams();
+//            layoutParams.gravity = Gravity.LEFT;
+//            holder.messageLinearLayout.setLayoutParams(layoutParams);
+//
+//            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.itemContentLinearLayout.getLayoutParams();
+//            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+//            lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+//            holder.itemContentLinearLayout.setLayoutParams(lp);
+//            layoutParams = (LinearLayout.LayoutParams) holder.messageTextView.getLayoutParams();
+//            layoutParams.gravity = Gravity.LEFT;
+//            holder.messageTextView.setLayoutParams(layoutParams);
+//
+//            layoutParams = (LinearLayout.LayoutParams) holder.dateTextView.getLayoutParams();
+//            layoutParams.gravity = Gravity.LEFT;
+//            holder.dateTextView.setLayoutParams(layoutParams);
         }
     }
 

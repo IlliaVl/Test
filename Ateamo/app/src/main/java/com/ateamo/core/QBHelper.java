@@ -38,8 +38,6 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     static final QBHelper sharedInstance = new QBHelper();
     private static final String TAG = "GroupChatManagerImpl";
 
-    private MainActivity mainActivity;
-
 
     static private Context context;
 
@@ -50,7 +48,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     //
     private static final String USER_LOGIN = "mish";
     //    private static final String USER_LOGIN = "illia";
-    private static final String USER_PASSWORD = "password";
+    private static final String USER_PASSWORD = "qqqqqqqq";
 //    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";
 //    private static final String USER_PASSWORD = "p@ssword";
 
@@ -139,7 +137,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
                     e.printStackTrace();
                 }
                 if (currentDialog != null) {
-                    mainActivity.refreshChat();
+                    MainActivity.getInstance().refreshChat();
                 }
                 // go to Dialogs screen
                 //
@@ -173,7 +171,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
                 if (dialogs.size() > 0) {
                     currentDialog = dialogs.get(0);
                     if (groupChatManager != null) {
-                        mainActivity.refreshChat();
+                        MainActivity.getInstance().refreshChat();
                     }
                 }
             }
@@ -209,12 +207,12 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
 
                 groupChat.addMessageListener(QBHelper.this);
 
-                mainActivity.runOnUiThread(new Runnable() {
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         callback.onSuccess();
 
-                        Toast.makeText(mainActivity, "Join successful", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.getInstance(), "Join successful", Toast.LENGTH_LONG).show();
                     }
                 });
                 Log.w("Chat", "Join successful");
@@ -223,7 +221,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
             @SuppressLint("LongLogTag")
             @Override
             public void onError(final List list) {
-                mainActivity.runOnUiThread(new Runnable() {
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         callback.onError(list);
@@ -263,11 +261,11 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
             } catch (IllegalStateException e){
                 e.printStackTrace();
 
-                Toast.makeText(mainActivity, "You are still joining a group chat, please white a bit", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.getInstance(), "You are still joining a group chat, please white a bit", Toast.LENGTH_LONG).show();
             }
 
         } else {
-            Toast.makeText(mainActivity, "Join unsuccessful", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.getInstance(), "Join unsuccessful", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -275,7 +273,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
         // Show message
         Log.w(TAG, "new incoming message: " + chatMessage);
-        mainActivity.showMessage(chatMessage);
+        MainActivity.getInstance().showMessage(chatMessage);
     }
 
     @Override
@@ -289,9 +287,5 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
 
     public QBUser getCurrentUser() {
         return currentUser;
-    }
-
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
     }
 }

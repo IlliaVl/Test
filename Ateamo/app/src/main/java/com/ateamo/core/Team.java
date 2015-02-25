@@ -1,5 +1,7 @@
 package com.ateamo.core;
 
+import com.ateamo.ateamo.MainActivity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,6 +49,10 @@ public class Team {
         if (teams.size() > 0) {
             setCurrent(teams.get(0));
         }
+        if (MainActivity.getInstance() != null) {
+            MainActivity.getInstance().fillLeftMenu();
+            MainActivity.getInstance().fillRightMenu();
+        }
     }
 
 
@@ -68,6 +74,7 @@ public class Team {
 
     public static void setCurrent(Team current) {
         Team.current = current;
+        AteamoFetcher.getSharedInstance().loadMembers();
         QBHelper.getSharedInstance().loginToCurrentTeamChat();
     }
 

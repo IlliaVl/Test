@@ -3,6 +3,7 @@ package com.ateamo.core;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.ateamo.ateamo.MainActivity;
 import com.ateamo.ateamo.R;
 
 import org.json.JSONArray;
@@ -69,6 +70,40 @@ public class Member {
                 e.printStackTrace();
             }
         }
+        if (MainActivity.getInstance() != null) {
+            MainActivity.getInstance().fillRightMenu();
+        }
+    }
+
+
+
+    static public void fillTest() {
+        String hash = "c02e33a07f2811e4b5c1001851012600";
+        String name = "Illia Vlasov";
+        String email = "iliavl@list.ru";
+        String profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/397ff121-ab0c-379b-44edef72e85eb137.jpg";
+        add(hash, name, email, profilePictureURL);
+        hash = "c02e33a07f2811001851012600";
+        name = "Mish Ding";
+        email = "mishding@gmail.com";
+        profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/d54e0d73-9dc8-5369-8c048f9878054fbb.png";
+        add(hash, name, email, profilePictureURL);
+        hash = "c02e33af66jk0907f28110012600";
+        name = "Sheldon Cooper";
+        email = "hh@gmail.com";
+        profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/3b667168-cb7a-6a7a-305623ccab9e15b5.jpg";
+        add(hash, name, email, profilePictureURL);
+        add(hash, name, email, profilePictureURL);
+        if (MainActivity.getInstance() != null) {
+            MainActivity.getInstance().fillRightMenu();
+        }
+    }
+
+
+
+    static private void add(String hash, String name, String email, String profilePictureURL) {
+        Member member = new Member(hash, name, email, profilePictureURL);
+        members.add(member);
     }
 
 
@@ -121,5 +156,9 @@ public class Member {
 
     public static Member getCurrent() {
         return current;
+    }
+
+    public static ArrayList<Member> getMembers() {
+        return members;
     }
 }
