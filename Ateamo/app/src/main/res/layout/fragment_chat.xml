@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingBottom="10dp">
 
             <Button
                 android:layout_width="34dp"
@@ -49,15 +49,17 @@
                 android:id="@+id/messagesContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentLeft="false"
                 android:layout_alignParentTop="false"
-                android:layout_marginBottom="20dp"
-                android:layout_above="@+id/messageEdit"
                 android:layout_below="@+id/meLabel"
                 android:layout_marginTop="10dp"
                 android:listSelector="@android:color/transparent"
                 android:transcriptMode="alwaysScroll"
-                android:divider="@null" />
+                android:divider="@null"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_above="@+id/attachmentButton"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp" />
 
             <TextView
                 android:id="@+id/meLabel"

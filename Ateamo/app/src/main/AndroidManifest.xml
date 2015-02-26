@@ -39,6 +39,22 @@
             android:name=".EmailLoginActivity"
             android:label="@string/title_activity_email_login" >
         </activity>
+        <activity
+            android:name=".SignupActivity"
+            android:label="@string/title_activity_signup" >
+        </activity>
+        <activity
+            android:name=".ForgetPasswordActivity"
+            android:label="@string/title_activity_forget_password" >
+        </activity>
+        <activity
+            android:name=".ConfirmAccountActivity"
+            android:label="@string/title_activity_confirm_account" >
+        </activity>
+        <activity
+            android:name=".CompleteAccountActivity"
+            android:label="@string/title_activity_complete_account" >
+        </activity>
     </application>
 
 </manifest>

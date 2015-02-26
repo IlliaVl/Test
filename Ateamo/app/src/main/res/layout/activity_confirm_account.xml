@@ -15,26 +15,50 @@
         android:src="@drawable/ateamo_logo"
         android:scaleType="fitCenter" />
 
-
-    <!--<AutoCompleteTextView android:id="@+id/email" android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content" android:hint="@string/prompt_email"-->
-        <!--android:inputType="textEmailAddress" android:maxLines="1"-->
-        <!--android:singleLine="true" />-->
-
-
-    <AutoCompleteTextView
-        android:id="@+id/email"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:inputType="textEmailAddress"
-        android:ems="10"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/rounded_corners_border"
-        android:hint="@string/prompt_email"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp" />
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:id="@+id/imageView3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/found_account_warning_text"
+            android:id="@+id/textView4" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Email: "
+            android:id="@+id/textView6"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="members@ateamo.com"
+            android:id="@+id/textView7" />
+    </LinearLayout>
 
     <EditText
         android:layout_width="match_parent"
@@ -54,7 +78,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/emailSignInButton"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/button_login"
+        android:src="@drawable/button_create_account"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter" />
 
@@ -69,18 +93,6 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:onClick="forgetPasswordButtonClicked" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create an account"
-        android:id="@+id/button7"
-        android:background="?android:selectableItemBackground"
-        android:layout_gravity="center_horizontal"
-        android:textStyle="bold"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:onClick="createAnAccountButtonClicked" />
 
     <!--android:background="?attr/selectableItemBackground" />-->
 

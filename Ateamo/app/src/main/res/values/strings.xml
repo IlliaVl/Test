@@ -11,4 +11,11 @@
     <string name="title_activity_main_activity2">MainActivity2Activity</string>
     <string name="title_activity_launch">LaunchActivity</string>
     <string name="title_activity_email_login">EmailLoginActivity</string>
+    <string name="title_activity_signup">SignupActivity</string>
+    <string name="title_activity_forget_password">ForgetPasswordActivity</string>
+    <string name="forget_login_text">If you are having trouble logging in to your account enter your email address below and we\'ll send you a link to reset your password.</string>
+    <string name="found_account_warning_text">We found an account with your email address. Please enter your Ateamo password below to confirm your account.</string>
+
+    <string name="title_activity_confirm_account">ConfirmAccountActivity</string>
+    <string name="title_activity_complete_account">CompleteAccountActivity</string>
 </resources>

@@ -2,7 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="50dp">
+    android:paddingLeft="50dp"
+    android:paddingRight="50dp"
+    android:paddingBottom="50dp"
+    android:paddingTop="30dp">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -19,7 +22,8 @@
         android:layout_gravity="center_horizontal"
         android:src="@drawable/button_loginwith_facebook"
         android:background="?android:selectableItemBackground"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:onClick="loginFacebookButtonClicked" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -38,7 +42,8 @@
         android:layout_gravity="center_horizontal"
         android:src="@drawable/button_createan_account"
         android:background="?android:selectableItemBackground"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:onClick="signupButtonClicked" />
 
     <ImageButton
         android:layout_width="wrap_content"
