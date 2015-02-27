@@ -67,6 +67,10 @@ public class ChatAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+//        TODO проверить задвоенность отправки сообщения
+        if (chatMessage.getSenderId() == null) {
+            return convertView;
+        }
 
         QBUser currentUser = QBHelper.getSharedInstance().getCurrentUser();
         boolean isOutgoing = chatMessage.getSenderId() == null || chatMessage.getSenderId().equals(currentUser.getId());

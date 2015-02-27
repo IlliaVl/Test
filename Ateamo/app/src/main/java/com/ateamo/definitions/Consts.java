@@ -19,4 +19,13 @@ public class Consts {
     public static final String GCM_INTENT_SERVICE = "GcmIntentService";
     public static final String GCM_SEND_ERROR = "Send error: ";
     public static final String GCM_RECEIVED = "Received: ";
+
+    public static final String GCM_DIALOG_NAME_ID = "dialogName";
+    public static final String GCM_GROUP_NAME_ID = "teamName";
+    public static final String GCM_GROUP_HASH_ID = "teamHash";
+    public static final String GCM_USERS_ID = "usersList";
+    public static final String GCM_OPPONENT_ID = "opponentId";
+    public static final String GCM_OPPONENT_HASH_ID = "opponentHash";
+    public static final String GCM_NOTIFICATION_TYPE_ID = "typeAPNSNotification";
+
 }

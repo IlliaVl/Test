@@ -19,13 +19,21 @@ import android.widget.TextView;
 import com.ateamo.adapters.ChatAdapter;
 import com.ateamo.ateamo.R;
 import com.ateamo.core.QBHelper;
+import com.ateamo.core.Team;
+import com.ateamo.definitions.Consts;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
+import com.quickblox.messages.QBMessages;
+import com.quickblox.messages.model.QBEnvironment;
+import com.quickblox.messages.model.QBEvent;
+import com.quickblox.messages.model.QBNotificationType;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,6 +77,7 @@ public class ChatFragment extends Fragment {
     private ChatAdapter adapter;
 
     private ArrayList<QBChatMessage> history;
+    private boolean opponentLogin = false;
 
     /**
      * Use this factory method to create a new instance of
@@ -147,6 +156,7 @@ public class ChatFragment extends Fragment {
                 if(mode == Mode.PRIVATE) {
                     showMessage(chatMessage);
                 }
+                sendPushMessage(chatMessage);
             }
         });
         joinGroupChat();
@@ -203,6 +213,8 @@ public class ChatFragment extends Fragment {
         });
     }
 
+
+
     public void showMessage(QBChatMessage message) {
         adapter.add(message);
 
@@ -215,17 +227,99 @@ public class ChatFragment extends Fragment {
         });
     }
 
+
+
+    private void sendPushMessage(QBChatMessage message) {
+//        ArrayList<Integer> onlineUsers = qbHelper.getOnlineUsers();
+//        ArrayList<Integer> toUsersList = new ArrayList<Integer>();
+//        ArrayList<Integer> occupants = qbHelper.getCurrentDialog().getOccupants();
+//        occupants.remove(qbHelper.getCurrentUser().getId());
+//        for (int i = occupants.size() - 1; i >= 0; --i) {
+//            if (!onlineUsers.contains(occupants.get(i))) {
+//                toUsersList.add(occupants.get(i));
+//            }
+//        }
+        ArrayList<Integer> occupants = qbHelper.getCurrentDialog().getOccupants();
+        ArrayList<Integer> toUsersList = occupants;
+        toUsersList.removeAll(qbHelper.getOnlineUsers());
+        if (toUsersList.size() == 0) {
+                return;
+        }
+
+        QBEvent event = new QBEvent();
+//        event.setUserIds(new StringifyArrayList<Integer>(toUsersList));
+        StringifyArrayList<Integer> testAPNSUsers = new StringifyArrayList<Integer>();
+        testAPNSUsers.add(2242466);
+        testAPNSUsers.add(2242477);
+        testAPNSUsers.add(2370901);
+        testAPNSUsers.add(2370921);
+        testAPNSUsers.add(2398799);
+        event.setUserIds(new StringifyArrayList<Integer>(testAPNSUsers));
+        event.setEnvironment(QBEnvironment.DEVELOPMENT);
+        event.setNotificationType(QBNotificationType.PUSH);
+
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("message", message.getBody());
+            JSONObject apsJson = new JSONObject();
+            apsJson.put("sound", "default");
+            apsJson.put("badge", 1);
+            apsJson.put("alert", message.getBody());
+            json.put("aps", apsJson);
+            if (!opponentLogin) {
+                json.put(Consts.GCM_USERS_ID, occupants);
+//                json.put(Consts.GCM_NOTIFICATION_TYPE_ID, );
+            } else {
+//                json.put(Consts.GCM_OPPONENT_ID, );
+//                json.put(Consts.GCM_OPPONENT_HASH_ID, );
+//                json.put(Consts.GCM_NOTIFICATION_TYPE_ID, );
+            }
+            json.put(Consts.GCM_DIALOG_NAME_ID, qbHelper.getCurrentDialog().getName());
+            json.put(Consts.GCM_GROUP_NAME_ID, Team.getCurrent().getName());
+            json.put(Consts.GCM_GROUP_HASH_ID, Team.getCurrent().getHash());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        event.setMessage(json.toString());
+
+        QBMessages.createEvent(event, new QBEntityCallbackImpl<QBEvent>() {
+            @Override
+            public void onSuccess(QBEvent qbEvent, Bundle args) {
+                // sent
+            }
+
+            @Override
+            public void onError(List<String> errors) {
+
+            }
+        });
+    }
+
+
+
     private void scrollDown() {
         messagesContainer.setSelection(messagesContainer.getCount() - 1);
     }
 
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onPause() {
+        super.onPause();
+        QBHelper.getSharedInstance().leaveRoom();
+    }
+
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         initViews(view);
         return view;
     }
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

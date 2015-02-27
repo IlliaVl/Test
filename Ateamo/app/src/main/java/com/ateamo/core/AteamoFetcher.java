@@ -82,7 +82,7 @@ public class AteamoFetcher {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-
+                Log.d("Response", error.getLocalizedMessage());
             }
         });
     }

@@ -3,6 +3,7 @@ package com.ateamo.core;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,8 +16,10 @@ import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBMessageListenerImpl;
+import com.quickblox.chat.listeners.QBParticipantListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBPresence;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBSettings;
@@ -47,6 +50,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     //    [QBConnection registerServiceKey:@"Gx6fuF5sMj-bzcP"];
     //
     private static final String USER_LOGIN = "mish";
+//    private static final String USER_LOGIN = "loca";
     //    private static final String USER_LOGIN = "illia";
     private static final String USER_PASSWORD = "qqqqqqqq";
 //    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";
@@ -59,7 +63,8 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     private QBChatService chatService;
     private QBDialog currentDialog;
     private QBGroupChat groupChat;
-
+    private QBParticipantListener participantListener;
+    private ArrayList<Integer> onlineUsers = new ArrayList<Integer>();
 
     private boolean loggedIn = false;
     private boolean loggingInProcess = false;
@@ -101,6 +106,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle args) {
+                initParticipantListener();
                 playServicesHelper = new PlayServicesHelper(context);
                 loggingInProcess = false;
                 loggedIn = true;
@@ -207,6 +213,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
             public void onSuccess() {
 
                 groupChat.addMessageListener(QBHelper.this);
+                groupChat.addParticipantListener(participantListener);
 
                 MainActivity.getInstance().runOnUiThread(new Runnable() {
                     @Override
@@ -233,6 +240,57 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
                 Log.w("Could not join chat, errors:", Arrays.toString(list.toArray()));
             }
         });
+    }
+
+
+
+    public void leaveRoom() {
+        (new AsyncTask<Void, Void, Void>(){
+            Exception exception;
+
+            @Override
+            protected Void doInBackground(Void... objects) {
+                if(groupChat == null){
+                    Log.i(TAG, "Please join room first");
+                    return null;
+                }
+
+                try {
+                    groupChat.leave();
+                    groupChat = null;
+                } catch (XMPPException e) {
+                    exception = e;
+                } catch (SmackException.NotConnectedException e) {
+                    exception = e;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                if (exception == null) {
+                    Log.i(TAG, "Leave success");
+                } else {
+                    Log.i(TAG, "Leave error: " + exception.getClass().getSimpleName());
+                }
+            }
+        }).execute();
+    }
+
+
+
+    private void initParticipantListener(){
+        participantListener = new QBParticipantListener() {
+            @Override
+            public void processPresence(QBGroupChat groupChat, QBPresence presence) {
+                Log.i(TAG, "groupChat: " + groupChat.getJid() + ", presence: " + presence);
+                try {
+                    onlineUsers = new ArrayList<Integer>(groupChat.getOnlineUsers());
+                } catch (XMPPException e) {
+
+                }
+            }
+        };
     }
 
 
@@ -288,5 +346,9 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
 
     public QBUser getCurrentUser() {
         return currentUser;
+    }
+
+    public ArrayList<Integer> getOnlineUsers() {
+        return onlineUsers;
     }
 }
