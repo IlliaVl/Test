@@ -7,7 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.ateamo.ateamo.MainActivity;
+import com.ateamo.UI.MainActivity;
 import com.ateamo.ateamo.R;
 import com.ateamo.core.Member;
 import com.nostra13.universalimageloader.core.ImageLoader;

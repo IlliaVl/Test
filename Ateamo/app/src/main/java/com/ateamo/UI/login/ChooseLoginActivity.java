@@ -1,9 +1,11 @@
-package com.ateamo.ateamo;
+package com.ateamo.UI.login;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
+import com.ateamo.ateamo.R;
 
 import java.util.Random;
 

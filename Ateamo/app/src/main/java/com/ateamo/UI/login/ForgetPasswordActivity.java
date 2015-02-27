@@ -1,8 +1,10 @@
-package com.ateamo.ateamo;
+package com.ateamo.UI.login;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+
+import com.ateamo.ateamo.R;
 
 
 public class ForgetPasswordActivity extends Activity {

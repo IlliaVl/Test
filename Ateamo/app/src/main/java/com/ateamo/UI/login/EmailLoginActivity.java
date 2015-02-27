@@ -1,4 +1,4 @@
-package com.ateamo.ateamo;
+package com.ateamo.UI.login;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -21,9 +21,10 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.ateamo.UI.MainActivity;
+import com.ateamo.ateamo.R;
 import com.ateamo.core.AteamoFetcher;
 import com.ateamo.core.CallBack;
 
@@ -58,7 +59,7 @@ public class EmailLoginActivity extends Activity implements LoaderCallbacks<Curs
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_email_login);
+        setContentView(R.layout.activity_email_login_test);
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -77,17 +78,23 @@ public class EmailLoginActivity extends Activity implements LoaderCallbacks<Curs
             }
         });
 
-        ImageButton mEmailSignInButton = (ImageButton) findViewById(R.id.emailSignInButton);
-        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLoginFake();
-//                attemptLogin();
-            }
-        });
+//        ImageButton mEmailSignInButton = (ImageButton) findViewById(R.id.emailSignInButton);
+//        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                attemptLoginFake();
+////                attemptLogin();
+//            }
+//        });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        mLoginFormView = findViewById(R.id.loginScrollView);
+        mProgressView = findViewById(R.id.loginProgressBar);
+    }
+
+
+
+    public void loginButtonClicked(View view) {
+        attemptLoginFake();
     }
 
 

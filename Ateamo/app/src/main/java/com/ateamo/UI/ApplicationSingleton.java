@@ -1,7 +1,12 @@
-package com.ateamo.ateamo;
+package com.ateamo.UI;
 
 import android.app.Application;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 
+import com.ateamo.core.AteamoFetcher;
+import com.ateamo.core.Member;
+import com.ateamo.core.QBHelper;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.users.model.QBUser;
 
@@ -11,6 +16,12 @@ import java.util.Map;
 
 public class ApplicationSingleton extends Application {
 
+    private static ApplicationSingleton instance;
+
+    public static ApplicationSingleton getInstance() {
+        return instance;
+    }
+
     private QBUser currentUser;
 
     private Map<Integer, QBUser> dialogsUsers = new HashMap<Integer, QBUser>();
@@ -18,9 +29,10 @@ public class ApplicationSingleton extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        QBHelper.getSharedInstance().init(this);
-//        AteamoFetcher.getSharedInstance().init(this);
-//        Member.initCurrentMember(this);
+        instance = this;
+        QBHelper.getSharedInstance().init(this);
+        AteamoFetcher.getSharedInstance().init(this);
+        Member.initCurrentMember(this);
     }
 
 
@@ -59,5 +71,20 @@ public class ApplicationSingleton extends Application {
             }
         }
         return opponentID;
+    }
+
+
+
+    /**
+     * @return Application's version code from the {@code PackageManager}.
+     */
+    public int getAppVersion() {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            // should never happen
+            throw new RuntimeException("Could not get package name: " + e);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.ateamo.core;
 
-import com.ateamo.ateamo.MainActivity;
+import com.ateamo.UI.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;

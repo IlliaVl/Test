@@ -3,7 +3,7 @@ package com.ateamo.core;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.ateamo.ateamo.MainActivity;
+import com.ateamo.UI.MainActivity;
 import com.ateamo.ateamo.R;
 
 import org.json.JSONArray;

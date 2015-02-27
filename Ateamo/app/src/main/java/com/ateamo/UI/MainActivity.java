@@ -1,4 +1,4 @@
-package com.ateamo.ateamo;
+package com.ateamo.UI;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.ateamo.adapters.MembersAdapter;
 import com.ateamo.adapters.TeamsAdapter;
+import com.ateamo.ateamo.R;
 import com.ateamo.core.Member;
 import com.ateamo.core.Team;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;

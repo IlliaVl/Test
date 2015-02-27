@@ -1,4 +1,4 @@
-package com.ateamo.ateamo;
+package com.ateamo.UI;
 
 import android.app.AlertDialog;
 import android.net.Uri;
@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ateamo.adapters.ChatAdapter;
+import com.ateamo.ateamo.R;
 import com.ateamo.core.QBHelper;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatMessage;

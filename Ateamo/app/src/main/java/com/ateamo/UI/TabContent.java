@@ -1,4 +1,4 @@
-package com.ateamo.ateamo;
+package com.ateamo.UI;
 
 import android.content.Context;
 import android.view.View;

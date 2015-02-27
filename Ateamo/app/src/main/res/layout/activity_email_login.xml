@@ -56,7 +56,8 @@
         android:layout_gravity="center_horizontal"
         android:src="@drawable/button_login"
         android:background="?android:selectableItemBackground"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:onClick="loginButtonClicked" />
 
     <Button
         android:layout_width="wrap_content"
@@ -81,6 +82,14 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:onClick="createAnAccountButtonClicked" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:id="@+id/progressBar2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
 
     <!--android:background="?attr/selectableItemBackground" />-->
 

@@ -8,9 +8,13 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.ateamo.ateamo.permission.C2D_MESSAGE" />
 
     <application
-        android:name=".ApplicationSingleton"
+        android:name="com.ateamo.UI.ApplicationSingleton"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -18,16 +22,16 @@
 
         <!-- android:theme="@style/AppTheme" > -->
         <activity
-            android:name=".ChooseLoginActivity"
+            android:name="com.ateamo.UI.login.ChooseLoginActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.ateamo.UI.MainActivity"
             android:label="@string/title_activity_main" >
         </activity>
         <activity
-            android:name=".LaunchActivity"
+            android:name="com.ateamo.UI.LaunchActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,25 +40,45 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EmailLoginActivity"
+            android:name="com.ateamo.UI.login.EmailLoginActivity"
             android:label="@string/title_activity_email_login" >
         </activity>
         <activity
-            android:name=".SignupActivity"
+            android:name="com.ateamo.UI.login.SignupActivity"
             android:label="@string/title_activity_signup" >
         </activity>
         <activity
-            android:name=".ForgetPasswordActivity"
+            android:name="com.ateamo.UI.login.ForgetPasswordActivity"
             android:label="@string/title_activity_forget_password" >
         </activity>
         <activity
-            android:name=".ConfirmAccountActivity"
+            android:name="com.ateamo.UI.login.ConfirmAccountActivity"
             android:label="@string/title_activity_confirm_account" >
         </activity>
         <activity
-            android:name=".CompleteAccountActivity"
+            android:name="com.ateamo.UI.login.CompleteAccountActivity"
             android:label="@string/title_activity_complete_account" >
         </activity>
+
+        <!-- 1. Add the following broadcast receiver.
+Notice that android:name in the category tag must be replaced by your application's package name -->
+        <receiver
+            android:name="com.ateamo.GCM.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.ateamo.ateamo" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 2. Add the following intent service: -->
+        <service android:name="com.ateamo.GCM.GCMIntentService" />
+
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

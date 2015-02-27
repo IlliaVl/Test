@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ateamo.ateamo.MainActivity;
+import com.ateamo.UI.MainActivity;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
@@ -64,7 +64,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     private boolean loggedIn = false;
     private boolean loggingInProcess = false;
 
-
+    private PlayServicesHelper playServicesHelper;
 
     private QBHelper() {
     }
@@ -101,6 +101,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle args) {
+                playServicesHelper = new PlayServicesHelper(context);
                 loggingInProcess = false;
                 loggedIn = true;
                 user.setId(session.getUserId());

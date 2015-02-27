@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ateamo.ateamo.MainActivity;
+import com.ateamo.UI.MainActivity;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
