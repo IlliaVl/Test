@@ -99,6 +99,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
             return;
         }
         final QBUser user = new QBUser();
+        //TODO Заменить на нормальную работу после завершения сервера
         user.setLogin(USER_LOGIN);
         user.setPassword(USER_PASSWORD);
 
@@ -143,7 +144,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
                 }
-                if (currentDialog != null) {
+                if (currentDialog != null && MainActivity.getInstance() != null) {
                     MainActivity.getInstance().refreshChat();
                 }
                 // go to Dialogs screen
@@ -164,12 +165,15 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
 
 
     public void loginToCurrentTeamChat() {
-        if (loggingInProcess || !loggedIn || Team.getCurrent() == null) {
+        //TODO Заменить на нормальную работу после завершения сервера
+        //TODO Добавить проверку  || Team.getCurrent() == null
+        if (loggingInProcess || !loggedIn) {
             return;
         }
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
 //        requestBuilder.addParameter("name", Team.getCurrent().getHash());
 //        requestBuilder.addParameter("name", "daad19a87f2811e4b5c1001851012600");
+        //TODO Заменить на нормальную работу после завершения сервера
         requestBuilder.addParameter("name", "mish, illia");
 
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
@@ -177,7 +181,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 if (dialogs.size() > 0) {
                     currentDialog = dialogs.get(0);
-                    if (groupChatManager != null) {
+                    if (groupChatManager != null && MainActivity.getInstance() != null) {
                         MainActivity.getInstance().refreshChat();
                     }
                 }
@@ -328,12 +332,16 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
         }
     }
 
+
+
     @Override
     public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
         // Show message
         Log.w(TAG, "new incoming message: " + chatMessage);
         MainActivity.getInstance().showMessage(chatMessage);
     }
+
+
 
     @Override
     public void processError(QBGroupChat groupChat, QBChatException error, QBChatMessage originMessage){

@@ -38,16 +38,23 @@ public class Team {
 
 
     static void fill(JSONArray teamsJSONArray) {
-        for (int index = 0; index < teamsJSONArray.length(); ++index) {
-            try {
-                JSONObject teamJSONObject = teamsJSONArray.getJSONObject(index);
-                teams.add(new Team(teamsJSONArray.getJSONObject(index)));
-            } catch (JSONException e) {
-                e.printStackTrace();
+        //TODO Заменить на нормальную работу после завершения сервера. teamsJSONArray != null - передаем null, ибо не залогинены в Ateamo
+        if (teamsJSONArray != null) {
+            for (int index = 0; index < teamsJSONArray.length(); ++index) {
+                try {
+                    JSONObject teamJSONObject = teamsJSONArray.getJSONObject(index);
+                    teams.add(new Team(teamsJSONArray.getJSONObject(index)));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
         if (teams.size() > 0) {
             setCurrent(teams.get(0));
+        } else {
+            //TODO Заменить на нормальную работу после завершения сервера
+            AteamoFetcher.getSharedInstance().loadMembers();
+            QBHelper.getSharedInstance().loginToCurrentTeamChat();
         }
         if (MainActivity.getInstance() != null) {
             MainActivity.getInstance().fillLeftMenu();

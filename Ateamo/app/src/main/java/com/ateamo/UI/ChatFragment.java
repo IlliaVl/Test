@@ -131,35 +131,38 @@ public class ChatFragment extends Fragment {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String messageText = messageEditText.getText().toString();
-                if (TextUtils.isEmpty(messageText) || qbHelper.getCurrentDialog() == null) {
-                    return;
-                }
-
-                // Send chat message
-                //
-                QBChatMessage chatMessage = new QBChatMessage();
-                chatMessage.setBody(messageText);
-                chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, "1");
-                chatMessage.setDateSent(new Date().getTime()/1000);
-
-                try {
-                    qbHelper.sendMessage(chatMessage);
-                } catch (XMPPException e) {
-                    Log.e(TAG, "failed to send a message", e);
-                } catch (SmackException sme){
-                    Log.e(TAG, "failed to send a message", sme);
-                }
-
-                messageEditText.setText("");
-
-                if(mode == Mode.PRIVATE) {
-                    showMessage(chatMessage);
-                }
-                sendPushMessage(chatMessage);
+                sendButtonClicked();
             }
         });
         joinGroupChat();
+    }
+
+
+
+    public void sendButtonClicked() {
+        String messageText = messageEditText.getText().toString();
+        if (TextUtils.isEmpty(messageText) || qbHelper.getCurrentDialog() == null) {
+            return;
+        }
+
+        // Send chat message
+        //
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setBody(messageText);
+        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, "1");
+        chatMessage.setDateSent(new Date().getTime()/1000);
+
+        try {
+            qbHelper.sendMessage(chatMessage);
+        } catch (XMPPException e) {
+            Log.e(TAG, "failed to send a message", e);
+        } catch (SmackException sme){
+            Log.e(TAG, "failed to send a message", sme);
+        }
+
+        messageEditText.setText("");
+
+        sendPushMessage(chatMessage);
     }
 
 
@@ -276,8 +279,12 @@ public class ChatFragment extends Fragment {
 //                json.put(Consts.GCM_NOTIFICATION_TYPE_ID, );
             }
             json.put(Consts.GCM_DIALOG_NAME_ID, qbHelper.getCurrentDialog().getName());
-            json.put(Consts.GCM_GROUP_NAME_ID, Team.getCurrent().getName());
-            json.put(Consts.GCM_GROUP_HASH_ID, Team.getCurrent().getHash());
+            //TODO Заменить на нормальную работу после завершения сервера. Было:
+//            json.put(Consts.GCM_GROUP_NAME_ID, Team.getCurrent().getName());
+//            json.put(Consts.GCM_GROUP_HASH_ID, Team.getCurrent().getHash());
+
+            json.put(Consts.GCM_GROUP_NAME_ID, Team.getCurrent() == null ? "" : Team.getCurrent().getName());
+            json.put(Consts.GCM_GROUP_HASH_ID, Team.getCurrent() == null ? "" : Team.getCurrent().getHash());
         } catch (Exception e) {
             e.printStackTrace();
         }

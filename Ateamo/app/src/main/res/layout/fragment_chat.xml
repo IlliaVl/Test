@@ -48,7 +48,7 @@
             <ListView
                 android:id="@+id/messagesContainer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_alignParentTop="false"
                 android:layout_below="@+id/meLabel"
                 android:layout_marginTop="10dp"

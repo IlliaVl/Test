@@ -1,10 +1,12 @@
 package com.ateamo.core;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.ateamo.UI.MainActivity;
 import com.ateamo.ateamo.R;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -19,6 +21,7 @@ import org.json.JSONObject;
  * Created by vlasovia on 19.02.15.
  */
 public class AteamoFetcher {
+    static final String TAG = "ATEAMO RESPONSE: ";
 
     private static final AteamoFetcher sharedInstance = new AteamoFetcher();
 
@@ -77,12 +80,17 @@ public class AteamoFetcher {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d("Response", decodedData);
+                Log.d(TAG, decodedData);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.d("Response", error.getLocalizedMessage());
+                Log.d(TAG, error.getLocalizedMessage());
+                if (MainActivity.getInstance() != null){
+                    new AlertDialog.Builder(AteamoFetcher.this.context).setMessage("Ateamo login failed. Error: " + error.getLocalizedMessage()).create().show();
+                }
+                //TODO Заменить на нормальную работу после завершения сервера
+                Member.setCurrent(new Member());
             }
         });
     }
@@ -126,7 +134,15 @@ public class AteamoFetcher {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-
+                Log.d(TAG, error.getLocalizedMessage());
+                if (MainActivity.getInstance() != null){
+                    new AlertDialog.Builder(MainActivity.getInstance()).setMessage("Teams not loaded. Error: " + error.getLocalizedMessage()).create().show();
+                }
+                //TODO Заменить на нормальную работу после завершения сервера
+                Team.fill(null);
+                if (callback != null) {
+                    callback.requestResponse(null);
+                }
             }
         });
     }
@@ -134,6 +150,7 @@ public class AteamoFetcher {
 
 
     public void loadMembers() {
+        //TODO Заменить на нормальную работу после завершения сервера
         new PostTask().execute("");
     }
 
