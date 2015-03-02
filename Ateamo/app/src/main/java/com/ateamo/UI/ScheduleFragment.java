@@ -6,8 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.ateamo.ateamo.R;
+
+import viewbadger.BadgeView;
 
 
 /**
@@ -61,12 +64,21 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_schedule, container, false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_schedule, container, false);
+        ImageButton attachmentButton = (ImageButton) view.findViewById(R.id.imageButton4);
+        BadgeView badge = new BadgeView(getActivity(), attachmentButton);
+        badge.setTextSize(4);
+        badge.setText("1");
+        badge.show();
+        return view;
     }
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

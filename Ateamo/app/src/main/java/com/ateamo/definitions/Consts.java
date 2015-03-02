@@ -28,4 +28,5 @@ public class Consts {
     public static final String GCM_OPPONENT_HASH_ID = "opponentHash";
     public static final String GCM_NOTIFICATION_TYPE_ID = "typeAPNSNotification";
 
+    public static int RESULT_LOAD_IMG = 1;
 }

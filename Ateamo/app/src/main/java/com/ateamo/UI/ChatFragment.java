@@ -1,8 +1,11 @@
 package com.ateamo.UI;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,6 +18,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ateamo.adapters.ChatAdapter;
 import com.ateamo.ateamo.R;
@@ -39,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import viewbadger.BadgeView;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,24 +57,23 @@ import java.util.List;
 public class ChatFragment extends Fragment {
     private static final String TAG = "CHAT";
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+//    // TODO: Rename parameter arguments, choose names that match
+//    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+//    private static final String ARG_PARAM1 = "param1";
+//    private static final String ARG_PARAM2 = "param2";
+//
+//    // TODO: Rename and change types of parameters
+//    private String mParam1;
+//    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
-    public static final String EXTRA_MODE = "mode";
-    public static final String EXTRA_DIALOG = "dialog";
     private final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
 
     private EditText messageEditText;
     private ListView messagesContainer;
     private Button sendButton;
+    private Button attachmentButton;
     private ProgressBar progressBar;
 
     public static enum Mode {PRIVATE, GROUP}
@@ -87,15 +92,15 @@ public class ChatFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ChatFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static ChatFragment newInstance(String param1, String param2) {
-        ChatFragment fragment = new ChatFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    // TODO: Rename and change types and number of parameters
+//    public static ChatFragment newInstance(String param1, String param2) {
+//        ChatFragment fragment = new ChatFragment();
+//        Bundle args = new Bundle();
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
 //    public ChatFragment() {
 //        // Required empty public constructor
@@ -104,10 +109,10 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+//        if (getArguments() != null) {
+//            mParam1 = getArguments().getString(ARG_PARAM1);
+//            mParam2 = getArguments().getString(ARG_PARAM2);
+//        }
     }
 
 
@@ -115,7 +120,26 @@ public class ChatFragment extends Fragment {
     private void initViews(View view) {
         messagesContainer = (ListView) view.findViewById(R.id.messagesContainer);
         messageEditText = (EditText) view.findViewById(R.id.messageEdit);
+
         sendButton = (Button) view.findViewById(R.id.chatSendButton);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendButtonClicked();
+            }
+        });
+
+        attachmentButton = (Button) view.findViewById(R.id.attachmentButton);
+        attachmentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attachmentButtonClicked();
+            }
+        });
+        BadgeView badge = new BadgeView(getActivity(), attachmentButton);
+        badge.setTextSize(4);
+        badge.setText("1");
+        badge.show();
 
         TextView meLabel = (TextView) view.findViewById(R.id.meLabel);
         TextView companionLabel = (TextView) view.findViewById(R.id.companionLabel);
@@ -127,13 +151,6 @@ public class ChatFragment extends Fragment {
         container.removeView(companionLabel);
 
         progressBar.setVisibility(View.VISIBLE);
-
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendButtonClicked();
-            }
-        });
         joinGroupChat();
     }
 
@@ -163,6 +180,48 @@ public class ChatFragment extends Fragment {
         messageEditText.setText("");
 
         sendPushMessage(chatMessage);
+    }
+
+
+
+    public void attachmentButtonClicked() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.setType("*/*");
+        startActivityForResult(galleryIntent, Consts.RESULT_LOAD_IMG);
+    }
+
+
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        super.startActivityForResult(intent, requestCode);
+        try {
+            // When an Image is picked
+            if (requestCode == Consts.RESULT_LOAD_IMG && intent != null) {
+                // Get the Image from data
+
+                Uri selectedImage = intent.getData();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+                // Get the cursor
+                Cursor cursor = getActivity().getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+                // Move to first row
+                cursor.moveToFirst();
+
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String attachment = cursor.getString(columnIndex);
+                cursor.close();
+//                ImageView imgView = (ImageView) findViewById(R.id.imgView);
+//                // Set the Image in ImageView after decoding the String
+//                imgView.setImageBitmap(BitmapFactory.decodeFile(imgDecodableString));
+
+            } else {
+                Toast.makeText(getActivity(), "You haven't picked Image", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 
 
