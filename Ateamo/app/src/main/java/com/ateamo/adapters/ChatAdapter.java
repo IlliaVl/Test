@@ -1,7 +1,12 @@
 package com.ateamo.adapters;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,14 +17,17 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.ateamo.UI.MainActivity;
 import com.ateamo.ateamo.R;
 import com.ateamo.core.Member;
 import com.ateamo.core.QBHelper;
 import com.ateamo.utils.TimeUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.users.model.QBUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatAdapter extends BaseAdapter {
@@ -80,6 +88,28 @@ public class ChatAdapter extends BaseAdapter {
         holder.dateTextView.setText(getTimeText(chatMessage));
         holder.nameTextView.setText(chatMessage.getSenderId().toString());
         ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), holder.iconImageView);
+
+        MainActivity mainActivity = MainActivity.getInstance();
+        if (mainActivity.getAttachmentUri() != null && mainActivity.getAttachmentQBId() != null && chatMessage.getAttachments().size() > 0) {
+            QBAttachment attachment = (new ArrayList<QBAttachment>(chatMessage.getAttachments())).get(0);
+            if (mainActivity.getAttachmentQBId().equals(attachment.getId())) {
+                Uri attachmentUri = mainActivity.getAttachmentUri();
+                if (attachmentUri != null) {
+                    ContentResolver contentResolver = mainActivity.getContentResolver();
+                    String attachmentType = contentResolver.getType(attachmentUri);
+                    if (attachmentType.contains("image")) {
+                        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                        Cursor cursor = contentResolver.query(attachmentUri, filePathColumn, null, null, null);
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        String imageDecodableString = cursor.getString(columnIndex);
+                        cursor.close();
+                        holder.attachmentImageView.setImageBitmap(BitmapFactory.decodeFile(imageDecodableString));
+                    }
+                }
+                mainActivity.clearAttachment();
+            }
+        }
         return convertView;
     }
 
@@ -117,6 +147,7 @@ public class ChatAdapter extends BaseAdapter {
         holder.dateTextView = (TextView) v.findViewById(R.id.dateTextView);
         holder.nameTextView = (TextView) v.findViewById(R.id.nameTextView);
         holder.iconImageView = (ImageView) v.findViewById(R.id.iconImageView);
+        holder.attachmentImageView = (ImageView) v.findViewById(R.id.attachmentImageView);
         return holder;
     }
 
@@ -126,6 +157,7 @@ public class ChatAdapter extends BaseAdapter {
 
     private static class ViewHolder {
         public ImageView iconImageView;
+        public ImageView attachmentImageView;
         public TextView messageTextView;
         public TextView dateTextView;
         public TextView nameTextView;

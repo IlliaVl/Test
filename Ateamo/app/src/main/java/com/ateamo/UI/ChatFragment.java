@@ -26,8 +26,13 @@ import com.ateamo.core.QBHelper;
 import com.ateamo.core.Team;
 import com.ateamo.definitions.Consts;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.content.QBContent;
+import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.QBProgressCallback;
+import com.quickblox.core.QBRequestCanceler;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.messages.QBMessages;
@@ -39,6 +44,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,25 +52,8 @@ import java.util.List;
 import viewbadger.BadgeView;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ChatFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ChatFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ChatFragment extends Fragment {
     private static final String TAG = "CHAT";
-
-//    // TODO: Rename parameter arguments, choose names that match
-//    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-//
-//    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -84,35 +73,13 @@ public class ChatFragment extends Fragment {
     private ArrayList<QBChatMessage> history;
     private boolean opponentLogin = false;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChatFragment.
-     */
-//    // TODO: Rename and change types and number of parameters
-//    public static ChatFragment newInstance(String param1, String param2) {
-//        ChatFragment fragment = new ChatFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-
-//    public ChatFragment() {
-//        // Required empty public constructor
-//    }
+    private Uri attachmentUri;
+    private String attachmentQBId;
+    BadgeView attachmentBadge;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
     }
 
 
@@ -136,10 +103,9 @@ public class ChatFragment extends Fragment {
                 attachmentButtonClicked();
             }
         });
-        BadgeView badge = new BadgeView(getActivity(), attachmentButton);
-        badge.setTextSize(4);
-        badge.setText("1");
-        badge.show();
+        attachmentBadge = new BadgeView(getActivity(), attachmentButton);
+        attachmentBadge.setTextSize(6);
+        attachmentBadge.setText("1");
 
         TextView meLabel = (TextView) view.findViewById(R.id.meLabel);
         TextView companionLabel = (TextView) view.findViewById(R.id.companionLabel);
@@ -151,7 +117,6 @@ public class ChatFragment extends Fragment {
         container.removeView(companionLabel);
 
         progressBar.setVisibility(View.VISIBLE);
-        joinGroupChat();
     }
 
 
@@ -161,25 +126,68 @@ public class ChatFragment extends Fragment {
         if (TextUtils.isEmpty(messageText) || qbHelper.getCurrentDialog() == null) {
             return;
         }
-
         // Send chat message
         //
-        QBChatMessage chatMessage = new QBChatMessage();
+        final QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(messageText);
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, "1");
         chatMessage.setDateSent(new Date().getTime()/1000);
 
+        if (attachmentUri != null) {
+            File file = new File(getPath(attachmentUri));
+            QBRequestCanceler requestCanceler = QBContent.uploadFileTask(file, true, null, new QBEntityCallbackImpl<QBFile>() {
+                @Override
+                public void onSuccess(QBFile qbFile, Bundle params) {
+                    attachmentQBId = qbFile.getId().toString();
+                    attachmentBadge.hide();
+                    // File public url. Will be null if fileIsPublic=false in query
+//                    String publicUrl = qbFile.getPublicUrl();
+                    QBAttachment attachment = new QBAttachment("photo");
+                    attachment.setId(attachmentQBId);
+                    chatMessage.addAttachment(attachment);
+                    sendMessage(chatMessage);
+                }
+
+                @Override
+                public void onError(List<String> errors) {
+
+                }
+            }, new QBProgressCallback() {
+                @Override
+                public void onProgressUpdate(int progress) {
+
+                }
+            });
+//            QBAttachment attachment = new QBAttachment("photo");
+//            attachment.setUrl();
+//            chatMessage.addAttachment(attachment);
+        } else {
+            sendMessage(chatMessage);
+        }
+    }
+
+
+
+    public String getPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getActivity().getContentResolver().query(attachmentUri, projection, null, null, null);
+//        startManagingCursor(cursor);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+
+
+    private void sendMessage(QBChatMessage message) {
         try {
-            qbHelper.sendMessage(chatMessage);
+            qbHelper.sendMessage(message);
         } catch (XMPPException e) {
             Log.e(TAG, "failed to send a message", e);
         } catch (SmackException sme){
             Log.e(TAG, "failed to send a message", sme);
         }
-
         messageEditText.setText("");
-
-        sendPushMessage(chatMessage);
+        sendPushMessage(message);
     }
 
 
@@ -187,7 +195,20 @@ public class ChatFragment extends Fragment {
     public void attachmentButtonClicked() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         galleryIntent.setType("*/*");
-        startActivityForResult(galleryIntent, Consts.RESULT_LOAD_IMG);
+//        startActivityForResult(galleryIntent, Consts.RESULT_LOAD_IMG);
+        getActivity().startActivityForResult(galleryIntent, Consts.RESULT_LOAD_IMG);
+    }
+
+
+
+    public void attachmentAdded(Intent intent) {
+        if (intent.getData() == null) {
+            attachmentUri = null;
+            attachmentBadge.hide();
+        } else {
+            attachmentUri = intent.getData();
+            attachmentBadge.show();
+        }
     }
 
 
@@ -200,11 +221,11 @@ public class ChatFragment extends Fragment {
             if (requestCode == Consts.RESULT_LOAD_IMG && intent != null) {
                 // Get the Image from data
 
-                Uri selectedImage = intent.getData();
+                attachmentUri = intent.getData();
                 String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
                 // Get the cursor
-                Cursor cursor = getActivity().getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+                Cursor cursor = getActivity().getContentResolver().query(attachmentUri, filePathColumn, null, null, null);
                 // Move to first row
                 cursor.moveToFirst();
 
@@ -219,8 +240,7 @@ public class ChatFragment extends Fragment {
                 Toast.makeText(getActivity(), "You haven't picked Image", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -379,6 +399,12 @@ public class ChatFragment extends Fragment {
 
 
     @Override
+    public void onResume() {
+        super.onResume();
+        joinGroupChat();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         initViews(view);
@@ -426,4 +452,18 @@ public class ChatFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+    public Uri getAttachmentUri() {
+        return attachmentUri;
+    }
+
+    public String getAttachmentQBId() {
+        return attachmentQBId;
+    }
+
+
+
+    public void clearAttachment() {
+        attachmentUri = null;
+        attachmentQBId = null;
+    }
 }

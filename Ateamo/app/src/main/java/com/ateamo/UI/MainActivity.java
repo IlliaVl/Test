@@ -1,5 +1,7 @@
 package com.ateamo.UI;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -8,12 +10,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ateamo.adapters.MembersAdapter;
 import com.ateamo.adapters.TeamsAdapter;
 import com.ateamo.ateamo.R;
 import com.ateamo.core.Member;
 import com.ateamo.core.Team;
+import com.ateamo.definitions.Consts;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -163,14 +167,6 @@ public class MainActivity extends FragmentActivity {
 
 
 
-    public void refreshChat() {
-        if (tabHost.getCurrentTab() == CHAT_TAB_NUMBER && chatFragment != null) {
-            chatFragment.joinGroupChat();
-        }
-    }
-
-
-
     public void openLeftMenu(View view) {
         slidingMenu.showMenu();
     }
@@ -183,13 +179,58 @@ public class MainActivity extends FragmentActivity {
 
 
 
+//region ChatFragment Methods
     public void showMessage(QBChatMessage message) {
         if (chatFragment != null) {
             chatFragment.showMessage(message);
         }
     }
 
+
+
+    public Uri getAttachmentUri() {
+        return chatFragment == null ? null : chatFragment.getAttachmentUri();
+    }
+
+
+    public String getAttachmentQBId() {
+        return chatFragment == null ? null : chatFragment.getAttachmentQBId();
+    }
+
+
+
+    public void clearAttachment() {
+        if (chatFragment != null) {
+            chatFragment.clearAttachment();
+        }
+    }
+
+
+
+    public void refreshChat() {
+        if (tabHost.getCurrentTab() == CHAT_TAB_NUMBER && chatFragment != null) {
+            chatFragment.joinGroupChat();
+        }
+    }
+//endregion
+
     public static MainActivity getInstance() {
         return instance;
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (requestCode == Consts.RESULT_LOAD_IMG) {
+                if (chatFragment != null) {
+                    chatFragment.attachmentAdded(data);
+                }
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 }
