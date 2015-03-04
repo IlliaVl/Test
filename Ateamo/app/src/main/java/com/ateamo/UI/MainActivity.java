@@ -19,6 +19,7 @@ import com.ateamo.core.Member;
 import com.ateamo.core.Team;
 import com.ateamo.definitions.Consts;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.quickblox.chat.model.QBChatMessage;
@@ -139,7 +140,8 @@ public class MainActivity extends FragmentActivity {
 
     public void fillLeftMenu() {
         final ImageView currentMemberPictureImageView = (ImageView) findViewById(R.id.currentMemberPictureImageView);
-        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), currentMemberPictureImageView);
+        DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).build();
+        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), currentMemberPictureImageView, options);
         final TextView currentMemberNameTextView = (TextView) findViewById(R.id.currentMemberNameTextView);
         currentMemberNameTextView.setText(Member.getCurrent().getName());
         final ListView teamsListView = (ListView) findViewById(R.id.teamsListView);
@@ -153,7 +155,8 @@ public class MainActivity extends FragmentActivity {
     public void fillRightMenu() {
         if (Team.getCurrent() != null) {
             final ImageView currentTeamBadgeImageView = (ImageView) findViewById(R.id.currentTeamBadgeImageView);
-            ImageLoader.getInstance().displayImage(Team.getCurrent().getBadgeURL(), currentTeamBadgeImageView);
+            DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).build();
+            ImageLoader.getInstance().displayImage(Team.getCurrent().getBadgeURL(), currentTeamBadgeImageView, options);
             final TextView currentTeamTextView = (TextView) findViewById(R.id.currentTeamTextView);
             currentTeamTextView.setText(Team.getCurrent().getName());
         }
@@ -229,8 +232,7 @@ public class MainActivity extends FragmentActivity {
                 }
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
         }
     }
 }

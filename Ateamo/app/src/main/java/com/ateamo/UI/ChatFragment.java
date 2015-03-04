@@ -144,6 +144,7 @@ public class ChatFragment extends Fragment {
 //                    String publicUrl = qbFile.getPublicUrl();
                     QBAttachment attachment = new QBAttachment("photo");
                     attachment.setId(attachmentQBId);
+                    attachment.setUrl(qbFile.getPublicUrl());
                     chatMessage.addAttachment(attachment);
                     sendMessage(chatMessage);
                 }

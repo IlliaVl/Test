@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ateamo.ateamo" >
+    package="com.ateamo.ateamo">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -18,21 +18,18 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/NoActionBar" >
+        android:theme="@style/NoActionBar">
 
         <!-- android:theme="@style/AppTheme" > -->
         <activity
             android:name="com.ateamo.UI.login.ChooseLoginActivity"
-            android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name="com.ateamo.UI.MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
+            android:label="@string/title_activity_main"></activity>
         <activity
             android:name="com.ateamo.UI.LaunchActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,24 +38,19 @@
         </activity>
         <activity
             android:name="com.ateamo.UI.login.EmailLoginActivity"
-            android:label="@string/title_activity_email_login" >
-        </activity>
+            android:label="@string/title_activity_email_login"></activity>
         <activity
             android:name="com.ateamo.UI.login.SignupActivity"
-            android:label="@string/title_activity_signup" >
-        </activity>
+            android:label="@string/title_activity_signup"></activity>
         <activity
             android:name="com.ateamo.UI.login.ForgetPasswordActivity"
-            android:label="@string/title_activity_forget_password" >
-        </activity>
+            android:label="@string/title_activity_forget_password"></activity>
         <activity
             android:name="com.ateamo.UI.login.ConfirmAccountActivity"
-            android:label="@string/title_activity_confirm_account" >
-        </activity>
+            android:label="@string/title_activity_confirm_account"></activity>
         <activity
             android:name="com.ateamo.UI.login.CompleteAccountActivity"
-            android:label="@string/title_activity_complete_account" >
-        </activity>
+            android:label="@string/title_activity_complete_account"></activity>
 
         <!-- 1. Add the following broadcast receiver.
 Notice that android:name in the category tag must be replaced by your application's package name -->
@@ -77,7 +69,8 @@ Notice that android:name in the category tag must be replaced by your applicatio
         <service android:name="com.ateamo.GCM.GCMIntentService" />
 
 
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
     </application>
 

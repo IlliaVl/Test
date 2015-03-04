@@ -22,6 +22,7 @@ import com.ateamo.ateamo.R;
 import com.ateamo.core.Member;
 import com.ateamo.core.QBHelper;
 import com.ateamo.utils.TimeUtils;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
@@ -87,27 +88,34 @@ public class ChatAdapter extends BaseAdapter {
         holder.messageTextView.setText(chatMessage.getBody());
         holder.dateTextView.setText(getTimeText(chatMessage));
         holder.nameTextView.setText(chatMessage.getSenderId().toString());
-        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), holder.iconImageView);
+        DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).build();
+        ImageLoader.getInstance().displayImage(Member.getCurrent().getProfilePictureURL(), holder.iconImageView, options);
 
-        MainActivity mainActivity = MainActivity.getInstance();
-        if (mainActivity.getAttachmentUri() != null && mainActivity.getAttachmentQBId() != null && chatMessage.getAttachments().size() > 0) {
+        if (chatMessage.getAttachments().size() > 0) {
             QBAttachment attachment = (new ArrayList<QBAttachment>(chatMessage.getAttachments())).get(0);
-            if (mainActivity.getAttachmentQBId().equals(attachment.getId())) {
-                Uri attachmentUri = mainActivity.getAttachmentUri();
-                if (attachmentUri != null) {
-                    ContentResolver contentResolver = mainActivity.getContentResolver();
-                    String attachmentType = contentResolver.getType(attachmentUri);
-                    if (attachmentType.contains("image")) {
-                        String[] filePathColumn = { MediaStore.Images.Media.DATA };
-                        Cursor cursor = contentResolver.query(attachmentUri, filePathColumn, null, null, null);
-                        cursor.moveToFirst();
-                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        String imageDecodableString = cursor.getString(columnIndex);
-                        cursor.close();
-                        holder.attachmentImageView.setImageBitmap(BitmapFactory.decodeFile(imageDecodableString));
+            MainActivity mainActivity = MainActivity.getInstance();
+            if (mainActivity.getAttachmentUri() != null && mainActivity.getAttachmentQBId() != null && chatMessage.getAttachments().size() > 0) {
+                if (mainActivity.getAttachmentQBId().equals(attachment.getId())) {
+                    Uri attachmentUri = mainActivity.getAttachmentUri();
+                    if (attachmentUri != null) {
+                        ContentResolver contentResolver = mainActivity.getContentResolver();
+                        String attachmentType = contentResolver.getType(attachmentUri);
+                        if (attachmentType.contains("image")) {
+                            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                            Cursor cursor = contentResolver.query(attachmentUri, filePathColumn, null, null, null);
+                            cursor.moveToFirst();
+                            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                            String imageDecodableString = cursor.getString(columnIndex);
+                            cursor.close();
+                            holder.attachmentImageView.setImageBitmap(BitmapFactory.decodeFile(imageDecodableString));
+                        }
                     }
+                    mainActivity.clearAttachment();
                 }
-                mainActivity.clearAttachment();
+            } else {
+//                ImageLoader.getInstance().displayImage(attachment.getUrl(), holder.attachmentImageView);
+                String attachmentURL = attachment.getUrl();
+                ImageLoader.getInstance().displayImage(attachment.getUrl(), holder.attachmentImageView, options);
             }
         }
         return convertView;
