@@ -25,7 +25,8 @@
                 android:layout_alignParentBottom="true"
                 android:layout_toEndOf="@+id/relativeLayout3"
                 android:layout_alignTop="@+id/relativeLayout3"
-                android:layout_toRightOf="@+id/relativeLayout3" />
+                android:layout_toRightOf="@+id/relativeLayout3"
+                android:imeOptions="actionDone" />
 
             <Button
                 android:id="@+id/chatSendButton"
