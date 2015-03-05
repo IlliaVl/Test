@@ -38,8 +38,12 @@ public class MainActivity extends FragmentActivity {
 
     private final String SCHEDULE_TAB_ID = "schedule";
     private final String SCHEDULE_TAB_NAME_ID = "Schedule";
+    private final String NOTIFICATIONS_TAB_ID = "notifications";
+    private final String NOTIFICATIONS_TAB_NAME_ID = "Notifications";
     private final String CHAT_TAB_ID = "chat";
     private final String CHAT_TAB_NAME_ID = "Chat";
+    private final String PAYMENTS_TAB_ID = "payments";
+    private final String PAYMENTS_TAB_NAME_ID = "Payments";
 
     private SlidingMenu slidingMenu;
     private ChatFragment chatFragment;
@@ -65,16 +69,24 @@ public class MainActivity extends FragmentActivity {
             public void onTabChanged(String tabId) {
                 android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
                 ScheduleFragment scheduleFragment = (ScheduleFragment) fragmentManager.findFragmentByTag(SCHEDULE_TAB_ID);
+                NotificationsFragment notificationsFragment = (NotificationsFragment) fragmentManager.findFragmentByTag(NOTIFICATIONS_TAB_ID);
                 chatFragment = (ChatFragment) fragmentManager.findFragmentByTag(CHAT_TAB_ID);
+                PaymentsFragment paymentsFragment = (PaymentsFragment) fragmentManager.findFragmentByTag(PAYMENTS_TAB_ID);
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                 if(scheduleFragment != null) {
                     fragmentTransaction.detach(scheduleFragment);
                 }
-
+                if(notificationsFragment != null) {
+                    fragmentTransaction.detach(notificationsFragment);
+                }
                 if(chatFragment != null) {
                     fragmentTransaction.detach(chatFragment);
                 }
+                if(paymentsFragment != null) {
+                    fragmentTransaction.detach(paymentsFragment);
+                }
+
                 if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)) {
                     if(scheduleFragment == null){
                         fragmentTransaction.add(R.id.realtabcontent, new ScheduleFragment(), SCHEDULE_TAB_ID);
@@ -82,32 +94,48 @@ public class MainActivity extends FragmentActivity {
                         fragmentTransaction.attach(scheduleFragment);
                     }
 
-                } else {
+                } else if (tabId.equalsIgnoreCase(NOTIFICATIONS_TAB_ID)) {
+                    if(notificationsFragment == null) {
+                        notificationsFragment = new NotificationsFragment();
+                        fragmentTransaction.add(R.id.realtabcontent, notificationsFragment, NOTIFICATIONS_TAB_ID);
+                    } else {
+                        fragmentTransaction.attach(notificationsFragment);
+                    }
+                } else if (tabId.equalsIgnoreCase(CHAT_TAB_ID)) {
                     if(chatFragment == null) {
                         chatFragment = new ChatFragment();
                         fragmentTransaction.add(R.id.realtabcontent, chatFragment, CHAT_TAB_ID);
                     } else {
                         fragmentTransaction.attach(chatFragment);
                     }
+                } else if (tabId.equalsIgnoreCase(PAYMENTS_TAB_ID)) {
+                    if(paymentsFragment == null) {
+                        paymentsFragment = new PaymentsFragment();
+                        fragmentTransaction.add(R.id.realtabcontent, paymentsFragment, PAYMENTS_TAB_ID);
+                    } else {
+                        fragmentTransaction.attach(paymentsFragment);
+                    }
                 }
                 fragmentTransaction.commit();
             }
         };
         tabHost.setOnTabChangedListener(tabChangeListener);
-        tabHost.addTab(getTabSpec(tabHost.newTabSpec(SCHEDULE_TAB_ID), R.drawable.tab_indicator, SCHEDULE_TAB_NAME_ID, R.drawable.schedule_icon));
-        tabHost.addTab(getTabSpec(tabHost.newTabSpec(CHAT_TAB_ID), R.drawable.tab_indicator, CHAT_TAB_NAME_ID, R.drawable.chat_icon));
+        tabHost.addTab(getTabSpec(tabHost.newTabSpec(SCHEDULE_TAB_ID), SCHEDULE_TAB_NAME_ID, R.drawable.schedule_icon));
+        tabHost.addTab(getTabSpec(tabHost.newTabSpec(NOTIFICATIONS_TAB_ID), NOTIFICATIONS_TAB_NAME_ID, R.drawable.notifications_icon));
+        tabHost.addTab(getTabSpec(tabHost.newTabSpec(CHAT_TAB_ID), CHAT_TAB_NAME_ID, R.drawable.chat_icon));
+        tabHost.addTab(getTabSpec(tabHost.newTabSpec(PAYMENTS_TAB_ID), PAYMENTS_TAB_NAME_ID, R.drawable.payments_icon));
     }
 
 
 
-    private TabHost.TabSpec getTabSpec(TabHost.TabSpec spec, int resourceId, String tabName, int tabIcon) {
+    private TabHost.TabSpec getTabSpec(TabHost.TabSpec tabSpec, String tabName, int tabIcon) {
         View view = LayoutInflater.from(this).inflate(R.layout.tab_item, null);
-        view.setBackgroundResource(resourceId);
+        view.setBackgroundResource(R.drawable.tab_indicator);
         ((TextView)view.findViewById(R.id.tabTextView)).setText(tabName);
         ((ImageView)view.findViewById(R.id.tabImageView)).setBackgroundResource(tabIcon);
-        spec.setContent(new TabContent(getBaseContext()));
-        spec.setIndicator(view);
-        return spec;
+        tabSpec.setContent(new TabContent(getBaseContext()));
+        tabSpec.setIndicator(view);
+        return tabSpec;
     }
 
 
