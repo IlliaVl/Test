@@ -18,4 +18,27 @@
 
     <string name="title_activity_confirm_account">ConfirmAccountActivity</string>
     <string name="title_activity_complete_account">CompleteAccountActivity</string>
+    <string name="title_activity_create_team">CreateTeamActivity</string>
+    <string name="create_team_hint">Type your team name here...</string>
+
+    <string-array name="sport_types">
+        <item>Baseball</item>
+        <item>Basketball</item>
+        <item>Croquet</item>
+        <item>Dodgeball</item>
+        <item>Flag Football</item>
+        <item>Frisbee</item>
+        <item>Indoor Soccer</item>
+        <item>Kickball</item>
+        <item>Rugby</item>
+        <item>Soccer</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="genders">
+        <item>Coed</item>
+        <item>Men\'s</item>
+        <item>Women\'s</item>
+    </string-array>
+
 </resources>

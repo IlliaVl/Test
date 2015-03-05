@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -145,9 +146,19 @@ public class MainActivity extends FragmentActivity {
         final TextView currentMemberNameTextView = (TextView) findViewById(R.id.currentMemberNameTextView);
         currentMemberNameTextView.setText(Member.getCurrent().getName());
         final ListView teamsListView = (ListView) findViewById(R.id.teamsListView);
+        final View footer = getLayoutInflater().inflate(R.layout.teams_listview_footer, null);
+        teamsListView.addFooterView(footer);
         final ArrayList<Team> list = Team.getTeams();
         final TeamsAdapter adapter = new TeamsAdapter(this, R.layout.list_item_team, Team.getTeams());
         teamsListView.setAdapter(adapter);
+        final Button addTeamButton = (Button) findViewById(R.id.addTeamButton);
+        addTeamButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CreateTeamActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
