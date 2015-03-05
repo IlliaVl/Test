@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -93,17 +94,20 @@ public class MainActivity extends FragmentActivity {
             }
         };
         tabHost.setOnTabChangedListener(tabChangeListener);
+        tabHost.addTab(getTabSpec(tabHost.newTabSpec(SCHEDULE_TAB_ID), R.drawable.tab_indicator, SCHEDULE_TAB_NAME_ID, R.drawable.schedule_icon));
+        tabHost.addTab(getTabSpec(tabHost.newTabSpec(CHAT_TAB_ID), R.drawable.tab_indicator, CHAT_TAB_NAME_ID, R.drawable.chat_icon));
+    }
 
-        TabHost.TabSpec tSpecAndroid = tabHost.newTabSpec(SCHEDULE_TAB_ID);
-        tSpecAndroid.setIndicator(SCHEDULE_TAB_NAME_ID,getResources().getDrawable(R.drawable.schedule));
-        tSpecAndroid.setContent(new TabContent(getBaseContext()));
-        tabHost.addTab(tSpecAndroid);
 
-        TabHost.TabSpec tSpecApple = tabHost.newTabSpec(CHAT_TAB_ID);
-        tSpecApple.setIndicator(CHAT_TAB_NAME_ID,getResources().getDrawable(R.drawable.chat));
-        tSpecApple.setContent(new TabContent(getBaseContext()));
-        tabHost.addTab(tSpecApple);
 
+    private TabHost.TabSpec getTabSpec(TabHost.TabSpec spec, int resourceId, String tabName, int tabIcon) {
+        View view = LayoutInflater.from(this).inflate(R.layout.tab_item, null);
+        view.setBackgroundResource(resourceId);
+        ((TextView)view.findViewById(R.id.tabTextView)).setText(tabName);
+        ((ImageView)view.findViewById(R.id.tabImageView)).setBackgroundResource(tabIcon);
+        spec.setContent(new TabContent(getBaseContext()));
+        spec.setIndicator(view);
+        return spec;
     }
 
 
