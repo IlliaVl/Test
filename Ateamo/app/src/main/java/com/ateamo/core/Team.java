@@ -25,6 +25,11 @@ public class Team {
 
 
 
+    Team() {
+    }
+
+
+
     Team(JSONObject teamJSONObject) {
         try {
             hash = teamJSONObject.getString(HASH_ID);
@@ -48,18 +53,40 @@ public class Team {
                     e.printStackTrace();
                 }
             }
-        }
-        if (teams.size() > 0) {
             setCurrent(teams.get(0));
-        } else {
-            //TODO Заменить на нормальную работу после завершения сервера
-            AteamoFetcher.getSharedInstance().loadMembers();
-            QBHelper.getSharedInstance().loginToCurrentTeamChat();
+        } else {//TODO Заменить на нормальную работу после завершения сервера
+            fill();
         }
         if (MainActivity.getInstance() != null) {
             MainActivity.getInstance().fillLeftMenu();
             MainActivity.getInstance().fillRightMenu();
         }
+    }
+
+
+
+    static void fill() {
+        Team team = new Team();
+        team.hash = "B815676B-DBAF-82D2-081A16F4832C3E91";
+        team.name = "Newtone Fake";
+        team.badgeURL = "https://56cca85f3d3b04107041-73eb90caa3bcecdbd63d0f38a250333c.ssl.cf1.rackcdn.com/B815676B-DBAF-82D2-081A16F4832C3E91.png";
+        teams.add(team);
+        team = new Team();
+        team.hash = "ABF297A1-CECD-0D94-5E31209D9ECE2C9C";
+        team.name = "Rabbit Fake";
+        team.badgeURL = "https://56cca85f3d3b04107041-73eb90caa3bcecdbd63d0f38a250333c.ssl.cf1.rackcdn.com/ABF297A1-CECD-0D94-5E31209D9ECE2C9C.png";
+        teams.add(team);
+        team = new Team();
+        team.hash = "DB904AF35FAFB322";
+        team.name = "Austin Athletic Club II Fake";
+        team.badgeURL = "http://cdn6.atimg.net/DB904AF35FAFB322.png";
+        teams.add(team);
+        team = new Team();
+        team.hash = "221D48F4CE6443D9";
+        team.name = "Austin Athletic Club O30 Fake";
+        team.badgeURL = "http://cdn6.atimg.net/221D48F4CE6443D9.png";
+        teams.add(team);
+        setCurrent(teams.get(0));
     }
 
 
@@ -83,6 +110,9 @@ public class Team {
         Team.current = current;
         AteamoFetcher.getSharedInstance().loadMembers();
         QBHelper.getSharedInstance().loginToCurrentTeamChat();
+        if (MainActivity.getInstance() != null) {
+            MainActivity.getInstance().currentTeamChanged(current);
+        }
     }
 
     public static Team getCurrent() {

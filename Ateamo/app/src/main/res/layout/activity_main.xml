@@ -8,32 +8,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:id="@+id/hamburgerButton"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:background="@drawable/hamburger_icon"
-            android:onClick="openLeftMenu" />
+            android:src="@drawable/ic_view_list_white_36dp"
+            android:onClick="openLeftMenu"
+            android:background="#ff458945" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:id="@+id/dotsButton"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/dots"
-            android:onClick="openRightMenu" />
+            android:onClick="openRightMenu"
+            android:src="@drawable/ic_more_horiz_white_36dp"
+            android:background="#ff458945" />
+            <!--android:background="?android:selectableItemBackground"/>-->
 
         <TabHost
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/tabHost"
-            android:layout_below="@+id/hamburgerButton"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/hamburgerButton">
 
             <RelativeLayout
                 android:layout_width="fill_parent"
@@ -61,6 +61,34 @@
 
             </RelativeLayout>
         </TabHost>
+
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/imageView4"-->
+            <!--android:layout_alignParentTop="true"-->
+            <!--android:layout_toRightOf="@+id/hamburgerButton"-->
+            <!--android:layout_above="@+id/tabHost"-->
+            <!--android:layout_toLeftOf="@+id/dotsButton"-->
+            <!--android:layout_toStartOf="@+id/dotsButton"-->
+            <!--android:background="#ff458945" />-->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/currentTeamNameTextView"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/hamburgerButton"
+            android:layout_above="@+id/tabHost"
+            android:layout_toLeftOf="@+id/dotsButton"
+            android:layout_toStartOf="@+id/dotsButton"
+            android:layout_gravity="center"
+            android:background="#ff458945"
+            android:textColor="#ffffffff"
+            android:textStyle="bold"
+            android:textSize="24dp"
+            android:gravity="center_vertical|center_horizontal" />
 
     </RelativeLayout>
 </LinearLayout>

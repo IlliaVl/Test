@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -48,14 +49,22 @@ public class MainActivity extends FragmentActivity {
     private SlidingMenu slidingMenu;
     private ChatFragment chatFragment;
     private TabHost tabHost;
+
+    private TextView currentTeamNameTextView;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        instance = this;
         setContentView(R.layout.activity_main);
+        instance = this;
+        currentTeamNameTextView = (TextView) findViewById(R.id.currentTeamNameTextView);
+        currentTeamNameTextView.setText(Team.getCurrent() == null ? "" : Team.getCurrent().getName());
         initTabs();
         initImageLoader();
         initMenus();
+
     }
 
 
@@ -146,7 +155,7 @@ public class MainActivity extends FragmentActivity {
     }
 
 
-
+//region Menu Methods
     private void initMenus() {
         slidingMenu = new SlidingMenu(this);
         slidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
@@ -164,6 +173,7 @@ public class MainActivity extends FragmentActivity {
 
 
 
+//region LeftMenu Methods
     private void fillMenus() {
         fillLeftMenu();
         fillRightMenu();
@@ -180,21 +190,35 @@ public class MainActivity extends FragmentActivity {
         final ListView teamsListView = (ListView) findViewById(R.id.teamsListView);
         final View footer = getLayoutInflater().inflate(R.layout.teams_listview_footer, null);
         teamsListView.addFooterView(footer);
-        final ArrayList<Team> list = Team.getTeams();
-        final TeamsAdapter adapter = new TeamsAdapter(this, R.layout.list_item_team, Team.getTeams());
-        teamsListView.setAdapter(adapter);
         final Button addTeamButton = (Button) findViewById(R.id.addTeamButton);
-        addTeamButton.setOnClickListener(new View.OnClickListener(){
+        addTeamButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, CreateTeamActivity.class);
                 startActivity(intent);
             }
         });
+        final TeamsAdapter adapter = new TeamsAdapter(this, R.layout.list_item_team, Team.getTeams());
+        teamsListView.setAdapter(adapter);
+        teamsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
+                Team team = Team.getTeams().get(position);
+                Team.setCurrent(team);
+                slidingMenu.showContent();
+            }
+        });
     }
 
 
 
+    public void openLeftMenu(View view) {
+        slidingMenu.showMenu();
+    }
+//endregion
+
+
+
+//region RightMenu Methods
     public void fillRightMenu() {
         if (Team.getCurrent() != null) {
             final ImageView currentTeamBadgeImageView = (ImageView) findViewById(R.id.currentTeamBadgeImageView);
@@ -213,15 +237,11 @@ public class MainActivity extends FragmentActivity {
 
 
 
-    public void openLeftMenu(View view) {
-        slidingMenu.showMenu();
-    }
-
-
-
     public void openRightMenu(View view) {
         slidingMenu.showSecondaryMenu();
     }
+//endregion
+//endregion
 
 
 
@@ -260,8 +280,16 @@ public class MainActivity extends FragmentActivity {
     }
 //endregion
 
+
+
     public static MainActivity getInstance() {
         return instance;
+    }
+
+
+
+    public void currentTeamChanged(Team team) {
+        currentTeamNameTextView.setText(team.getName());
     }
 
 
