@@ -29,4 +29,7 @@ public class Consts {
     public static final String GCM_NOTIFICATION_TYPE_ID = "typeAPNSNotification";
 
     public static int RESULT_LOAD_IMG = 1;
+
+
+    public static final String OPPONENT_EXTRA_ID = "opponent";
 }

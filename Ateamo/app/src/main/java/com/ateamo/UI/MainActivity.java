@@ -27,8 +27,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.quickblox.chat.model.QBChatMessage;
 
-import java.util.ArrayList;
-
 
 
 public class MainActivity extends FragmentActivity {
@@ -230,9 +228,16 @@ public class MainActivity extends FragmentActivity {
         final TextView membersNumberTextView = (TextView) findViewById(R.id.membersNumberTextView);
         membersNumberTextView.setText("Players(" + Integer.toString(Member.getMembers().size()) + ")");
         final ListView membersListview = (ListView) findViewById(R.id.membersListView);
-        final ArrayList<Member> list = Member.getMembers();
         final MembersAdapter adapter = new MembersAdapter(this, R.layout.list_item_team_member, Member.getMembers());
         membersListview.setAdapter(adapter);
+        membersListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
+                Member member = Member.getMembers().get(position);
+                Intent intent = new Intent(MainActivity.this, PrivateChatActivity.class);
+                intent.putExtra(Consts.OPPONENT_EXTRA_ID, member);
+                MainActivity.this.startActivity(intent);
+            }
+        });
     }
 
 

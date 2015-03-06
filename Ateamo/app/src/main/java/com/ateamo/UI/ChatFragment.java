@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.ateamo.adapters.ChatAdapter;
 import com.ateamo.ateamo.R;
+import com.ateamo.core.Member;
 import com.ateamo.core.QBHelper;
 import com.ateamo.core.Team;
 import com.ateamo.definitions.Consts;
@@ -65,21 +66,31 @@ public class ChatFragment extends Fragment {
     private Button attachmentButton;
     private ProgressBar progressBar;
 
-    public static enum Mode {PRIVATE, GROUP}
-    private Mode mode = Mode.PRIVATE;
     private QBHelper qbHelper;
     private ChatAdapter adapter;
 
     private ArrayList<QBChatMessage> history;
     private boolean opponentLogin = false;
+    private Member opponent;
 
     private Uri attachmentUri;
     private String attachmentQBId;
     BadgeView attachmentBadge;
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        initViews(view);
+        return view;
     }
 
 
@@ -405,13 +416,6 @@ public class ChatFragment extends Fragment {
         joinGroupChat();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chat, container, false);
-        initViews(view);
-        return view;
-    }
-
 
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -466,5 +470,14 @@ public class ChatFragment extends Fragment {
     public void clearAttachment() {
         attachmentUri = null;
         attachmentQBId = null;
+    }
+
+
+    public Member getOpponent() {
+        return opponent;
+    }
+
+    public void setOpponent(Member opponent) {
+        this.opponent = opponent;
     }
 }

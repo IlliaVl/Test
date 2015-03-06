@@ -10,12 +10,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by vlasovia on 21.02.15.
  */
-public class Member {
+public class Member implements Serializable {
     private static final String HASH_ID = "hash";
     private static final String NAME_ID = "name";
     private static final String EMAIL_ID = "email";
