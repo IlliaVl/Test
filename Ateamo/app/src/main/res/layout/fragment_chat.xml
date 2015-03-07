@@ -37,16 +37,19 @@
                 android:background="@drawable/send_button"
                 android:layout_alignParentEnd="true" />
 
-            <ListView
-                android:id="@+id/messagesContainer"
+
+
+            <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--xmlns:tools="http://schemas.android.com/tools"-->
+
+            <!--tools:context="com.shppandroid1.app.MainActivity"-->
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/refresh"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
                 android:layout_alignParentTop="false"
                 android:layout_below="@+id/meLabel"
                 android:layout_marginTop="10dp"
-                android:listSelector="@android:color/transparent"
-                android:transcriptMode="alwaysScroll"
-                android:divider="@null"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:paddingLeft="5dp"
@@ -54,7 +57,18 @@
                 android:layout_above="@+id/messageEdit"
                 android:layout_alignParentBottom="false"
                 android:layout_toEndOf="@id/messageEdit"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true" >
+                <ListView
+                    android:id="@+id/messagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:listSelector="@android:color/transparent"
+                    android:transcriptMode="alwaysScroll"
+                    android:stackFromBottom="true"
+                    android:divider="@null" />
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+
 
             <TextView
                 android:id="@+id/meLabel"
@@ -72,14 +86,6 @@
                 android:layout_alignParentRight="true"
                 android:text="Friend"
                 android:textSize="20dp" />
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBar"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true" />
 
             <RelativeLayout
                 android:layout_width="34dp"

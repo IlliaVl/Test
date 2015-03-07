@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +33,6 @@ import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBProgressCallback;
-import com.quickblox.core.QBRequestCanceler;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.messages.QBMessages;
@@ -53,18 +52,16 @@ import java.util.List;
 import viewbadger.BadgeView;
 
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "CHAT";
 
     private OnFragmentInteractionListener mListener;
 
-    private final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
-
     private EditText messageEditText;
-    private ListView messagesContainer;
+    private ListView messagesListView;
     private Button sendButton;
     private Button attachmentButton;
-    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private QBHelper qbHelper;
     private ChatAdapter adapter;
@@ -76,6 +73,12 @@ public class ChatFragment extends Fragment {
     private Uri attachmentUri;
     private String attachmentQBId;
     BadgeView attachmentBadge;
+
+    private int numberOfPageMessages = 10;
+    private int numberOfMessages;
+    private int numberOfDisplayedMessages = numberOfPageMessages;
+    private int numberOfSkippedMessages;
+    private boolean updateProcess = false;
 
 
 
@@ -90,13 +93,14 @@ public class ChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         initViews(view);
+        initRefreshControl(view);
         return view;
     }
 
 
 
     private void initViews(View view) {
-        messagesContainer = (ListView) view.findViewById(R.id.messagesContainer);
+        messagesListView = (ListView) view.findViewById(R.id.messagesContainer);
         messageEditText = (EditText) view.findViewById(R.id.messageEdit);
 
         sendButton = (Button) view.findViewById(R.id.chatSendButton);
@@ -121,13 +125,18 @@ public class ChatFragment extends Fragment {
         TextView meLabel = (TextView) view.findViewById(R.id.meLabel);
         TextView companionLabel = (TextView) view.findViewById(R.id.companionLabel);
         RelativeLayout container = (RelativeLayout) view.findViewById(R.id.container);
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         qbHelper = QBHelper.getSharedInstance();
         container.removeView(meLabel);
         container.removeView(companionLabel);
+    }
 
-        progressBar.setVisibility(View.VISIBLE);
+
+
+    private void initRefreshControl(View view) {
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getIntArray(R.array.swipeRefreshColors));
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
 
@@ -141,12 +150,12 @@ public class ChatFragment extends Fragment {
         //
         final QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(messageText);
-        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, "1");
+        chatMessage.setProperty("save_to_history", "1");
         chatMessage.setDateSent(new Date().getTime()/1000);
 
         if (attachmentUri != null) {
             File file = new File(getPath(attachmentUri));
-            QBRequestCanceler requestCanceler = QBContent.uploadFileTask(file, true, null, new QBEntityCallbackImpl<QBFile>() {
+            QBContent.uploadFileTask(file, true, null, new QBEntityCallbackImpl<QBFile>() {
                 @Override
                 public void onSuccess(QBFile qbFile, Bundle params) {
                     attachmentQBId = qbFile.getId().toString();
@@ -200,6 +209,8 @@ public class ChatFragment extends Fragment {
         }
         messageEditText.setText("");
         sendPushMessage(message);
+        numberOfMessages++;
+        numberOfDisplayedMessages++;
     }
 
 
@@ -242,7 +253,7 @@ public class ChatFragment extends Fragment {
                 cursor.moveToFirst();
 
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String attachment = cursor.getString(columnIndex);
+//                String attachment = cursor.getString(columnIndex);
                 cursor.close();
 //                ImageView imgView = (ImageView) findViewById(R.id.imgView);
 //                // Set the Image in ImageView after decoding the String
@@ -279,32 +290,71 @@ public class ChatFragment extends Fragment {
 
 
     private void loadChatHistory(){
+        updateProcess = true;
+        swipeRefreshLayout.setRefreshing(true);
+        QBChatService.getDialogMessagesCount(qbHelper.getCurrentDialog().getDialogId(), new QBEntityCallbackImpl<Integer>() {
+            @Override
+            public void onSuccess(Integer result, Bundle params) {
+                super.onSuccess(result, params);
+                numberOfMessages = result;
+                numberOfSkippedMessages = numberOfMessages - numberOfPageMessages <= 0 ? 0 : numberOfMessages - numberOfPageMessages;
+                getChatHistory(false);
+            }
+
+            @Override
+            public void onError(List<String> errors) {
+                super.onError(errors);
+                swipeRefreshLayout.setRefreshing(false);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                dialog.setMessage("load chat history errors: " + errors).create().show();
+                updateProcess = false;
+            }
+        });
+    }
+
+
+
+    private void getChatHistory(boolean upRefresh){
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesLimit(100);
-        customObjectRequestBuilder.sortDesc("date_sent");
+        customObjectRequestBuilder.setPagesLimit(numberOfMessages - numberOfSkippedMessages);
+        customObjectRequestBuilder.setPagesSkip(numberOfSkippedMessages);
+        customObjectRequestBuilder.sortAsc("date_sent");
+        if (upRefresh) {
+            messagesListView.setStackFromBottom(false);
+        } else {
+            messagesListView.setStackFromBottom(true);
+        }
 
         QBChatService.getDialogMessages(qbHelper.getCurrentDialog(), customObjectRequestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> messages, Bundle args) {
                 history = messages;
-
-                adapter = new ChatAdapter(getActivity(), new ArrayList<QBChatMessage>());
-                messagesContainer.setAdapter(adapter);
-
-                for (int i = messages.size() - 1; i >= 0; --i) {
-                    QBChatMessage msg = messages.get(i);
-                    showMessage(msg);
-                }
-
-                progressBar.setVisibility(View.GONE);
+                adapter = new ChatAdapter(getActivity(), messages);
+                messagesListView.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onError(List<String> errors) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                 dialog.setMessage("load chat history errors: " + errors).create().show();
+                updateProcess = false;
             }
         });
+    }
+
+
+
+    @Override
+    public void onRefresh() {
+        if (numberOfSkippedMessages == 0) {
+            swipeRefreshLayout.setRefreshing(false);
+            return;
+        }
+        updateProcess = true;
+        numberOfSkippedMessages = numberOfSkippedMessages - numberOfPageMessages <= 0 ? 0 : numberOfSkippedMessages - numberOfPageMessages;
+        numberOfDisplayedMessages += numberOfMessages - numberOfSkippedMessages;
+        getChatHistory(true);
     }
 
 
@@ -397,7 +447,8 @@ public class ChatFragment extends Fragment {
 
 
     private void scrollDown() {
-        messagesContainer.setSelection(messagesContainer.getCount() - 1);
+        int hhh = messagesListView.getCount();
+        messagesListView.setSelection(messagesListView.getCount() - 1);
     }
 
 
@@ -441,6 +492,8 @@ public class ChatFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+
 
     /**
      * This interface must be implemented by activities that contain this
