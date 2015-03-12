@@ -74,7 +74,7 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private MessageListener messageListener;
     private QBParticipantListener participantListener;
     private ArrayList<Integer> onlineUsers = new ArrayList<Integer>();
-    private QBDialog dialog;
+    protected QBDialog dialog;
     private QBGroupChat chat;
     private ChatAdapter adapter;
 
@@ -447,16 +447,7 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
     private void sendPushMessage(QBChatMessage message) {
-//        ArrayList<Integer> onlineUsers = qbHelper.getOnlineUsers();
-//        ArrayList<Integer> toUsersList = new ArrayList<Integer>();
-//        ArrayList<Integer> occupants = qbHelper.getCurrentTeamDialog().getOccupants();
-//        occupants.remove(qbHelper.getCurrentUser().getId());
-//        for (int i = occupants.size() - 1; i >= 0; --i) {
-//            if (!onlineUsers.contains(occupants.get(i))) {
-//                toUsersList.add(occupants.get(i));
-//            }
-//        }
-        ArrayList<Integer> occupants = qbHelper.getCurrentTeamDialog().getOccupants();
+        ArrayList<Integer> occupants = dialog.getOccupants();
         ArrayList<Integer> toUsersList = occupants;
         toUsersList.removeAll(onlineUsers);
         if (toUsersList.size() == 0) {
@@ -464,7 +455,6 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
 
         QBEvent event = new QBEvent();
-//        event.setUserIds(new StringifyArrayList<Integer>(toUsersList));
         StringifyArrayList<Integer> testAPNSUsers = new StringifyArrayList<Integer>();
         testAPNSUsers.add(2242466);
         testAPNSUsers.add(2242477);
@@ -534,12 +524,6 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onPause() {
         super.onPause();
         leaveChat();
-//        try {
-//            QBHelper.getSharedInstance().release(chat);
-//        } catch (XMPPException e) {
-//            e.printStackTrace();
-//        }
-//        QBHelper.getSharedInstance().leaveRoom(chat);
     }
 
 
@@ -584,10 +568,6 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onResume() {
         super.onResume();
         joinChat();
-//        if (opponent == null) {
-//        } else {
-//            joinPrivateChat();
-//        }
     }
 
 

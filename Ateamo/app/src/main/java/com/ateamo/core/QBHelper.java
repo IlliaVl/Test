@@ -43,7 +43,9 @@ public class QBHelper {
     //    [QBConnection registerServiceKey:@"Gx6fuF5sMj-bzcP"];
     //
 //    private static final String USER_LOGIN = "mish";
-    private static final String USER_LOGIN = "loca";
+//    private static final String USER_LOGIN = "loca";
+//    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";//iliavl@list.ru
+    private static final String USER_LOGIN = "b8ddb9307f2911e4b5c1001851012600";//Sheldon Cooper
     //    private static final String USER_LOGIN = "illia";
     private static final String USER_PASSWORD = "qqqqqqqq";
 //    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";
@@ -168,7 +170,7 @@ public class QBHelper {
                     MainActivity.getInstance().refreshChat();
                 }
             }
-        }, "mish, illia");
+        }, "mish_illia");
     }
 
 
@@ -183,15 +185,15 @@ public class QBHelper {
 
     public void getDialog(final DialogCallback dialogCallback, final String... names){
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-//        requestBuilder.in("name", names);
+        requestBuilder.in("name", names);
 //        ArrayList<String> names1 = new ArrayList<String>();
 //        names1.add("8b0e82b0bb7a11e2860f00185191c0d9");
 //
 ////        requestBuilder.in("name", names1);
 //        requestBuilder.in("name", "8b0e82b0bb7a11e2860f00185191c0d9", "f1ae7a6c917e11e4b5c1001851012600");
-//        requestBuilder.in("name", "mish, illia");
-        requestBuilder.in("name", "test_dDDDDDhh", "mish_illia");
-//        requestBuilder.addParameter("name", "mish, illia");
+//        requestBuilder.in("name", "mish_illia");
+//        requestBuilder.in("name", "test_dDDDDDhh", "mish_illia"); WORKS
+//        requestBuilder.addParameter("name", "mish_illia");
 //        requestBuilder.addParameter("name", "8b0e82b0bb7a11e2860f00185191c0d9");
 
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {

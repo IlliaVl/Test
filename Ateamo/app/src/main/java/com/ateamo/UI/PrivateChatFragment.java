@@ -21,10 +21,10 @@ public class PrivateChatFragment extends ChatFragment {
         QBHelper.getSharedInstance().getDialog(new DialogCallback() {
             @Override
             public void response(QBDialog dialog) {
+                PrivateChatFragment.this.dialog = dialog;
+                PrivateChatFragment.super.joinChat();
             }
-        }, Member.getCurrent().getHash() + opponent.getHash(), opponent.getHash() + Member.getCurrent().getHash());
-
-        super.joinChat();
+        }, Member.getCurrent().getHash() + "_" + opponent.getHash(), opponent.getHash() + "_" + Member.getCurrent().getHash());
     }
 
 

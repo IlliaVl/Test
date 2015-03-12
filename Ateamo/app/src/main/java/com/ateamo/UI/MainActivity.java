@@ -251,15 +251,6 @@ public class MainActivity extends FragmentActivity {
 
 
 
-//region ChatFragment Methods
-//    public void showMessage(QBChatMessage message) {
-//        if (chatFragment != null) {
-//            chatFragment.showMessage(message);
-//        }
-//    }
-
-
-
     public Uri getAttachmentUri() {
         return chatFragment == null ? null : chatFragment.getAttachmentUri();
     }
@@ -282,7 +273,6 @@ public class MainActivity extends FragmentActivity {
     public void refreshChat() {
         if (chatFragment != null) {
             chatFragment.setDialog(QBHelper.getSharedInstance().getCurrentTeamDialog());
-//            chatFragment.setChat(QBHelper.getSharedInstance().getCurrentTeamDialog());
             if (tabHost.getCurrentTab() == CHAT_TAB_NUMBER) {
                 chatFragment.joinChat();
             }
