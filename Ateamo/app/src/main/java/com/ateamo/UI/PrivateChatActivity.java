@@ -18,7 +18,7 @@ public class PrivateChatActivity extends FragmentActivity {
         if (savedInstanceState == null) {
             Intent intent = getIntent();
             Member member = (Member)intent.getSerializableExtra(Consts.OPPONENT_EXTRA_ID);
-            ChatFragment chatFragment = new ChatFragment();
+            PrivateChatFragment chatFragment = new PrivateChatFragment();
             chatFragment.setOpponent(member);
             getSupportFragmentManager().beginTransaction().add(R.id.container, chatFragment).commit();
         }

@@ -89,7 +89,7 @@ public class Member implements Serializable {
         email = "mishding@gmail.com";
         profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/d54e0d73-9dc8-5369-8c048f9878054fbb.png";
         add(hash, name, email, profilePictureURL);
-        hash = "c02e33af66jk0907f28110012600";
+        hash = "b8ddb9307f2911e4b5c1001851012600";
         name = "Sheldon Cooper";
         email = "hh@gmail.com";
         profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/3b667168-cb7a-6a7a-305623ccab9e15b5.jpg";

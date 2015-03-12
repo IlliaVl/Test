@@ -19,13 +19,13 @@ import com.ateamo.adapters.MembersAdapter;
 import com.ateamo.adapters.TeamsAdapter;
 import com.ateamo.ateamo.R;
 import com.ateamo.core.Member;
+import com.ateamo.core.QBHelper;
 import com.ateamo.core.Team;
 import com.ateamo.definitions.Consts;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.quickblox.chat.model.QBChatMessage;
 
 
 
@@ -111,6 +111,7 @@ public class MainActivity extends FragmentActivity {
                 } else if (tabId.equalsIgnoreCase(CHAT_TAB_ID)) {
                     if(chatFragment == null) {
                         chatFragment = new ChatFragment();
+                        chatFragment.setDialog(QBHelper.getSharedInstance().getCurrentTeamDialog());
                         fragmentTransaction.add(R.id.realtabcontent, chatFragment, CHAT_TAB_ID);
                     } else {
                         fragmentTransaction.attach(chatFragment);
@@ -251,11 +252,11 @@ public class MainActivity extends FragmentActivity {
 
 
 //region ChatFragment Methods
-    public void showMessage(QBChatMessage message) {
-        if (chatFragment != null) {
-            chatFragment.showMessage(message);
-        }
-    }
+//    public void showMessage(QBChatMessage message) {
+//        if (chatFragment != null) {
+//            chatFragment.showMessage(message);
+//        }
+//    }
 
 
 
@@ -279,8 +280,12 @@ public class MainActivity extends FragmentActivity {
 
 
     public void refreshChat() {
-        if (tabHost.getCurrentTab() == CHAT_TAB_NUMBER && chatFragment != null) {
-            chatFragment.joinGroupChat();
+        if (chatFragment != null) {
+            chatFragment.setDialog(QBHelper.getSharedInstance().getCurrentTeamDialog());
+//            chatFragment.setChat(QBHelper.getSharedInstance().getCurrentTeamDialog());
+            if (tabHost.getCurrentTab() == CHAT_TAB_NUMBER) {
+                chatFragment.joinChat();
+            }
         }
     }
 //endregion

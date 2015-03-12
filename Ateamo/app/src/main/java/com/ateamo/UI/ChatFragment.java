@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -22,13 +23,18 @@ import android.widget.Toast;
 
 import com.ateamo.adapters.ChatAdapter;
 import com.ateamo.ateamo.R;
-import com.ateamo.core.Member;
 import com.ateamo.core.QBHelper;
 import com.ateamo.core.Team;
 import com.ateamo.definitions.Consts;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChat;
+import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBMessageListenerImpl;
+import com.quickblox.chat.listeners.QBParticipantListener;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBPresence;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -42,6 +48,7 @@ import com.quickblox.messages.model.QBNotificationType;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -64,11 +71,15 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private QBHelper qbHelper;
+    private MessageListener messageListener;
+    private QBParticipantListener participantListener;
+    private ArrayList<Integer> onlineUsers = new ArrayList<Integer>();
+    private QBDialog dialog;
+    private QBGroupChat chat;
     private ChatAdapter adapter;
 
     private ArrayList<QBChatMessage> history;
-    private boolean opponentLogin = false;
-    private Member opponent;
+//    private boolean opponentLogin = false;
 
     private Uri attachmentUri;
     private String attachmentQBId;
@@ -85,6 +96,24 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        messageListener = new MessageListener();
+        initParticipantListener();
+    }
+
+
+
+    private void initParticipantListener(){
+        participantListener = new QBParticipantListener() {
+            @Override
+            public void processPresence(QBGroupChat chat, QBPresence presence) {
+                Log.i(TAG, "teamChat: " + chat.getJid() + ", presence: " + presence);
+                try {
+                    onlineUsers = new ArrayList<Integer>(chat.getOnlineUsers());
+                } catch (XMPPException e) {
+
+                }
+            }
+        };
     }
 
 
@@ -143,7 +172,7 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     public void sendButtonClicked() {
         String messageText = messageEditText.getText().toString();
-        if (TextUtils.isEmpty(messageText) || qbHelper.getCurrentDialog() == null) {
+        if (TextUtils.isEmpty(messageText) || dialog == null) {
             return;
         }
         // Send chat message
@@ -199,19 +228,44 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
 
+
     private void sendMessage(QBChatMessage message) {
-        try {
-            qbHelper.sendMessage(message);
-        } catch (XMPPException e) {
-            Log.e(TAG, "failed to send a message", e);
-        } catch (SmackException sme){
-            Log.e(TAG, "failed to send a message", sme);
+        if (chat != null) {
+            try {
+                chat.sendMessage(message);
+                messageEditText.setText("");
+                sendPushMessage(message);
+                numberOfMessages++;
+                numberOfDisplayedMessages++;
+            } catch (SmackException.NotConnectedException nce){
+                nce.printStackTrace();
+            } catch (IllegalStateException e){
+                e.printStackTrace();
+
+                Toast.makeText(MainActivity.getInstance(), "You are still joining a group chat, please white a bit", Toast.LENGTH_LONG).show();
+            } catch (XMPPException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            Toast.makeText(MainActivity.getInstance(), "Join unsuccessful", Toast.LENGTH_LONG).show();
         }
-        messageEditText.setText("");
-        sendPushMessage(message);
-        numberOfMessages++;
-        numberOfDisplayedMessages++;
     }
+
+
+//    private void sendMessage(QBChatMessage message) {
+//        try {
+//            qbHelper.sendMessage(chat, message);
+//        } catch (XMPPException e) {
+//            Log.e(TAG, "failed to send a message", e);
+//        } catch (SmackException sme){
+//            Log.e(TAG, "failed to send a message", sme);
+//        }
+//        messageEditText.setText("");
+//        sendPushMessage(message);
+//        numberOfMessages++;
+//        numberOfDisplayedMessages++;
+//    }
 
 
 
@@ -269,14 +323,33 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
 
-    public void joinGroupChat() {
-        if (qbHelper.getCurrentDialog() == null) {
+//    public void joinPrivateChat() {
+//        qbHelper.joinPrivateChat(opponent, new QBEntityCallbackImpl() {
+//            @Override
+//            public void onSuccess() {
+//                loadChatHistory(qbHelper.getPrivateDialog());
+//            }
+//
+//            @Override
+//            public void onError(List list) {
+//                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+//                dialog.setMessage("error when join group chat: " + list.toString()).create().show();
+//            }
+//        });
+//    }
+
+
+
+    public void joinChat() {
+        if (dialog == null) {
             return;
         }
-        qbHelper.joinGroupChat(new QBEntityCallbackImpl() {
+        chat = qbHelper.joinChat(dialog, new QBEntityCallbackImpl() {
             @Override
             public void onSuccess() {
-                loadChatHistory();
+                chat.addMessageListener(messageListener);
+                chat.addParticipantListener(participantListener);
+                loadChatHistory(dialog);
             }
 
             @Override
@@ -289,16 +362,16 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
 
-    private void loadChatHistory(){
+    private void loadChatHistory(final QBDialog dialog){
         updateProcess = true;
         swipeRefreshLayout.setRefreshing(true);
-        QBChatService.getDialogMessagesCount(qbHelper.getCurrentDialog().getDialogId(), new QBEntityCallbackImpl<Integer>() {
+        QBChatService.getDialogMessagesCount(dialog.getDialogId(), new QBEntityCallbackImpl<Integer>() {
             @Override
             public void onSuccess(Integer result, Bundle params) {
                 super.onSuccess(result, params);
                 numberOfMessages = result;
                 numberOfSkippedMessages = numberOfMessages - numberOfPageMessages <= 0 ? 0 : numberOfMessages - numberOfPageMessages;
-                getChatHistory(false);
+                getChatHistory(dialog, false);
             }
 
             @Override
@@ -314,7 +387,7 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
 
-    private void getChatHistory(boolean upRefresh){
+    private void getChatHistory(QBDialog dialog, boolean upRefresh){
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesLimit(numberOfMessages - numberOfSkippedMessages);
         customObjectRequestBuilder.setPagesSkip(numberOfSkippedMessages);
@@ -325,7 +398,7 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             messagesListView.setStackFromBottom(true);
         }
 
-        QBChatService.getDialogMessages(qbHelper.getCurrentDialog(), customObjectRequestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
+        QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, new QBEntityCallbackImpl<ArrayList<QBChatMessage>>() {
             @Override
             public void onSuccess(ArrayList<QBChatMessage> messages, Bundle args) {
                 history = messages;
@@ -354,7 +427,7 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         updateProcess = true;
         numberOfSkippedMessages = numberOfSkippedMessages - numberOfPageMessages <= 0 ? 0 : numberOfSkippedMessages - numberOfPageMessages;
         numberOfDisplayedMessages += numberOfMessages - numberOfSkippedMessages;
-        getChatHistory(true);
+        getChatHistory(dialog, true);
     }
 
 
@@ -376,16 +449,16 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private void sendPushMessage(QBChatMessage message) {
 //        ArrayList<Integer> onlineUsers = qbHelper.getOnlineUsers();
 //        ArrayList<Integer> toUsersList = new ArrayList<Integer>();
-//        ArrayList<Integer> occupants = qbHelper.getCurrentDialog().getOccupants();
+//        ArrayList<Integer> occupants = qbHelper.getCurrentTeamDialog().getOccupants();
 //        occupants.remove(qbHelper.getCurrentUser().getId());
 //        for (int i = occupants.size() - 1; i >= 0; --i) {
 //            if (!onlineUsers.contains(occupants.get(i))) {
 //                toUsersList.add(occupants.get(i));
 //            }
 //        }
-        ArrayList<Integer> occupants = qbHelper.getCurrentDialog().getOccupants();
+        ArrayList<Integer> occupants = qbHelper.getCurrentTeamDialog().getOccupants();
         ArrayList<Integer> toUsersList = occupants;
-        toUsersList.removeAll(qbHelper.getOnlineUsers());
+        toUsersList.removeAll(onlineUsers);
         if (toUsersList.size() == 0) {
                 return;
         }
@@ -411,15 +484,8 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             apsJson.put("badge", 1);
             apsJson.put("alert", message.getBody());
             json.put("aps", apsJson);
-            if (!opponentLogin) {
-                json.put(Consts.GCM_USERS_ID, occupants);
-//                json.put(Consts.GCM_NOTIFICATION_TYPE_ID, );
-            } else {
-//                json.put(Consts.GCM_OPPONENT_ID, );
-//                json.put(Consts.GCM_OPPONENT_HASH_ID, );
-//                json.put(Consts.GCM_NOTIFICATION_TYPE_ID, );
-            }
-            json.put(Consts.GCM_DIALOG_NAME_ID, qbHelper.getCurrentDialog().getName());
+            putJsonDataForPushMessage(json, occupants);
+            json.put(Consts.GCM_DIALOG_NAME_ID, qbHelper.getCurrentTeamDialog().getName());
             //TODO Заменить на нормальную работу после завершения сервера. Было:
 //            json.put(Consts.GCM_GROUP_NAME_ID, Team.getCurrent().getName());
 //            json.put(Consts.GCM_GROUP_HASH_ID, Team.getCurrent().getHash());
@@ -446,6 +512,17 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
 
+    protected void putJsonDataForPushMessage(JSONObject json, ArrayList<Integer> occupants) {
+        try {
+            json.put(Consts.GCM_USERS_ID, occupants);
+//                json.put(Consts.GCM_NOTIFICATION_TYPE_ID, );
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     private void scrollDown() {
         int hhh = messagesListView.getCount();
         messagesListView.setSelection(messagesListView.getCount() - 1);
@@ -456,7 +533,49 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onPause() {
         super.onPause();
-        QBHelper.getSharedInstance().leaveRoom();
+        leaveChat();
+//        try {
+//            QBHelper.getSharedInstance().release(chat);
+//        } catch (XMPPException e) {
+//            e.printStackTrace();
+//        }
+//        QBHelper.getSharedInstance().leaveRoom(chat);
+    }
+
+
+
+    private void leaveChat() {
+        (new AsyncTask<Void, Void, Void>(){
+            Exception exception;
+
+            @Override
+            protected Void doInBackground(Void... objects) {
+                if(chat == null){
+                    Log.i(TAG, "Please join room first");
+                    return null;
+                }
+
+                try {
+                    chat.leave();
+                    chat.removeMessageListener(messageListener);
+                    chat = null;
+                } catch (XMPPException e) {
+                    exception = e;
+                } catch (SmackException.NotConnectedException e) {
+                    exception = e;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                if (exception == null) {
+                    Log.i(TAG, "Leave success");
+                } else {
+                    Log.i(TAG, "Leave error: " + exception.getClass().getSimpleName());
+                }
+            }
+        }).execute();
     }
 
 
@@ -464,7 +583,11 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onResume() {
         super.onResume();
-        joinGroupChat();
+        joinChat();
+//        if (opponent == null) {
+//        } else {
+//            joinPrivateChat();
+//        }
     }
 
 
@@ -525,12 +648,26 @@ public class ChatFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         attachmentQBId = null;
     }
 
-
-    public Member getOpponent() {
-        return opponent;
+    public void setDialog(QBDialog dialog) {
+        this.dialog = dialog;
     }
 
-    public void setOpponent(Member opponent) {
-        this.opponent = opponent;
+    public void setChat(QBGroupChat chat) {
+        this.chat = chat;
+    }
+
+
+
+    private class MessageListener extends QBMessageListenerImpl<QBGroupChat> {
+        @Override
+        public void processMessage(QBGroupChat sender, QBChatMessage message) {
+            super.processMessage(sender, message);
+            ChatFragment.this.showMessage(message);
+        }
+
+        @Override
+        public void processError(QBGroupChat sender, QBChatException exception, QBChatMessage message) {
+            super.processError(sender, exception, message);
+        }
     }
 }

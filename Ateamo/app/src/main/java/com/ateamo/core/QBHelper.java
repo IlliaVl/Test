@@ -3,7 +3,6 @@ package com.ateamo.core;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -14,12 +13,7 @@ import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
-import com.quickblox.chat.exception.QBChatException;
-import com.quickblox.chat.listeners.QBMessageListenerImpl;
-import com.quickblox.chat.listeners.QBParticipantListener;
-import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBPresence;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.core.QBSettings;
@@ -27,7 +21,6 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.util.ArrayList;
@@ -37,7 +30,7 @@ import java.util.List;
 /**
  * Created by vlasovia on 21.02.15.
  */
-public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements ChatManager {
+public class QBHelper {
     static final QBHelper sharedInstance = new QBHelper();
     private static final String TAG = "GroupChatManagerImpl";
 
@@ -49,8 +42,8 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     private static final String AUTH_SECRET = "hMH7bO6TNwk7c-Q";
     //    [QBConnection registerServiceKey:@"Gx6fuF5sMj-bzcP"];
     //
-    private static final String USER_LOGIN = "mish";
-//    private static final String USER_LOGIN = "loca";
+//    private static final String USER_LOGIN = "mish";
+    private static final String USER_LOGIN = "loca";
     //    private static final String USER_LOGIN = "illia";
     private static final String USER_PASSWORD = "qqqqqqqq";
 //    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";
@@ -61,10 +54,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
     private QBGroupChatManager groupChatManager;
     private QBUser currentUser;
     private QBChatService chatService;
-    private QBDialog currentDialog;
-    private QBGroupChat groupChat;
-    private QBParticipantListener participantListener;
-    private ArrayList<Integer> onlineUsers = new ArrayList<Integer>();
+    private QBDialog currentTeamDialog;
 
     private boolean loggedIn = false;
     private boolean loggingInProcess = false;
@@ -107,7 +97,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle args) {
-                initParticipantListener();
+//                initParticipantListener();
                 playServicesHelper = new PlayServicesHelper(context);
                 loggingInProcess = false;
                 loggedIn = true;
@@ -144,7 +134,7 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
                 } catch (SmackException.NotLoggedInException e) {
                     e.printStackTrace();
                 }
-                if (currentDialog != null && MainActivity.getInstance() != null) {
+                if (currentTeamDialog != null && MainActivity.getInstance() != null) {
                     MainActivity.getInstance().refreshChat();
                 }
                 // go to Dialogs screen
@@ -170,20 +160,45 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
         if (loggingInProcess || !loggedIn) {
             return;
         }
+        getDialog(new DialogCallback() {
+            @Override
+            public void response(QBDialog dialog) {
+                currentTeamDialog = dialog;
+                if (groupChatManager != null && MainActivity.getInstance() != null) {
+                    MainActivity.getInstance().refreshChat();
+                }
+            }
+        }, "mish, illia");
+    }
+
+
+
+    public QBGroupChat joinChat(QBDialog dialog, QBEntityCallback callback){
+        QBGroupChat chat = groupChatManager.createGroupChat(dialog.getRoomJid());
+        join(chat, callback);
+        return chat;
+    }
+
+
+
+    public void getDialog(final DialogCallback dialogCallback, final String... names){
         QBRequestGetBuilder requestBuilder = new QBRequestGetBuilder();
-//        requestBuilder.addParameter("name", Team.getCurrent().getHash());
-//        requestBuilder.addParameter("name", "daad19a87f2811e4b5c1001851012600");
-        //TODO Заменить на нормальную работу после завершения сервера
-        requestBuilder.addParameter("name", "mish, illia");
+//        requestBuilder.in("name", names);
+//        ArrayList<String> names1 = new ArrayList<String>();
+//        names1.add("8b0e82b0bb7a11e2860f00185191c0d9");
+//
+////        requestBuilder.in("name", names1);
+//        requestBuilder.in("name", "8b0e82b0bb7a11e2860f00185191c0d9", "f1ae7a6c917e11e4b5c1001851012600");
+//        requestBuilder.in("name", "mish, illia");
+        requestBuilder.in("name", "test_dDDDDDhh", "mish_illia");
+//        requestBuilder.addParameter("name", "mish, illia");
+//        requestBuilder.addParameter("name", "8b0e82b0bb7a11e2860f00185191c0d9");
 
         QBChatService.getChatDialogs(null, requestBuilder, new QBEntityCallbackImpl<ArrayList<QBDialog>>() {
             @Override
             public void onSuccess(ArrayList<QBDialog> dialogs, Bundle args) {
                 if (dialogs.size() > 0) {
-                    currentDialog = dialogs.get(0);
-                    if (groupChatManager != null && MainActivity.getInstance() != null) {
-                        MainActivity.getInstance().refreshChat();
-                    }
+                    dialogCallback.response(dialogs.get(0));
                 }
             }
 
@@ -201,24 +216,13 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
 
 
 
-    public void joinGroupChat(QBEntityCallback callback){
-        groupChat = groupChatManager.createGroupChat(currentDialog.getRoomJid());
-        join(groupChat, callback);
-    }
-
-
-
-    private void join(final QBGroupChat groupChat, final QBEntityCallback callback) {
+    private void join(final QBGroupChat chat, final QBEntityCallback callback) {
         DiscussionHistory history = new DiscussionHistory();
         history.setMaxStanzas(0);
 
-        groupChat.join(history, new QBEntityCallbackImpl() {
+        chat.join(history, new QBEntityCallbackImpl() {
             @Override
             public void onSuccess() {
-
-                groupChat.addMessageListener(QBHelper.this);
-                groupChat.addParticipantListener(participantListener);
-
                 MainActivity.getInstance().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -246,117 +250,11 @@ public class QBHelper extends QBMessageListenerImpl<QBGroupChat> implements Chat
         });
     }
 
-
-
-    public void leaveRoom() {
-        (new AsyncTask<Void, Void, Void>(){
-            Exception exception;
-
-            @Override
-            protected Void doInBackground(Void... objects) {
-                if(groupChat == null){
-                    Log.i(TAG, "Please join room first");
-                    return null;
-                }
-
-                try {
-                    groupChat.leave();
-                    groupChat = null;
-                } catch (XMPPException e) {
-                    exception = e;
-                } catch (SmackException.NotConnectedException e) {
-                    exception = e;
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                if (exception == null) {
-                    Log.i(TAG, "Leave success");
-                } else {
-                    Log.i(TAG, "Leave error: " + exception.getClass().getSimpleName());
-                }
-            }
-        }).execute();
-    }
-
-
-
-    private void initParticipantListener(){
-        participantListener = new QBParticipantListener() {
-            @Override
-            public void processPresence(QBGroupChat groupChat, QBPresence presence) {
-                Log.i(TAG, "groupChat: " + groupChat.getJid() + ", presence: " + presence);
-                try {
-                    onlineUsers = new ArrayList<Integer>(groupChat.getOnlineUsers());
-                } catch (XMPPException e) {
-
-                }
-            }
-        };
-    }
-
-
-
-    @Override
-    public void release() throws XMPPException {
-        if (groupChat != null) {
-            try {
-                groupChat.leave();
-            } catch (SmackException.NotConnectedException nce){
-                nce.printStackTrace();
-            }
-
-            groupChat.removeMessageListener(this);
-        }
-    }
-
-
-
-    @Override
-    public void sendMessage(QBChatMessage message) throws XMPPException, SmackException.NotConnectedException {
-        if (groupChat != null) {
-            try {
-                groupChat.sendMessage(message);
-            } catch (SmackException.NotConnectedException nce){
-                nce.printStackTrace();
-            } catch (IllegalStateException e){
-                e.printStackTrace();
-
-                Toast.makeText(MainActivity.getInstance(), "You are still joining a group chat, please white a bit", Toast.LENGTH_LONG).show();
-            }
-
-        } else {
-            Toast.makeText(MainActivity.getInstance(), "Join unsuccessful", Toast.LENGTH_LONG).show();
-        }
-    }
-
-
-
-    @Override
-    public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
-        // Show message
-        Log.w(TAG, "new incoming message: " + chatMessage);
-        MainActivity.getInstance().showMessage(chatMessage);
-    }
-
-
-
-    @Override
-    public void processError(QBGroupChat groupChat, QBChatException error, QBChatMessage originMessage){
-
-    }
-
-    public QBDialog getCurrentDialog() {
-        return currentDialog;
+    public QBDialog getCurrentTeamDialog() {
+        return currentTeamDialog;
     }
 
     public QBUser getCurrentUser() {
         return currentUser;
-    }
-
-    public ArrayList<Integer> getOnlineUsers() {
-        return onlineUsers;
     }
 }
