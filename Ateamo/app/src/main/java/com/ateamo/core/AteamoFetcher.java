@@ -29,6 +29,7 @@ public class AteamoFetcher {
     static final String authUrlString = "/oauth/token";
     static final String teamsUrlString = "/teams";
     static final String membersUrlString = "/members";
+    static final String scheduleUrlString = "/schedule";
     static final String clientSecret = "Wt}{tS{KG{U<uP&Iz],$,O6>*pG`NdP9]^#/bTkj5i($s!|PuVcKA0B!x-86~KUV";
 
     static final String ACCESS_TOKEN_FIELD_ID = "access_token";
@@ -84,6 +85,7 @@ public class AteamoFetcher {
                             callback.requestResponse(null);
                         }
                     }
+                    loadSchedule();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -156,9 +158,68 @@ public class AteamoFetcher {
 
 
 
+    public void loadSchedule() {
+        Team currentTeam = Team.getCurrent();
+        if (currentTeam == null) {
+            return;
+        }
+        Header[] headers = {new BasicHeader("Authorization", "Bearer " + accessToken)};
+        RequestParams params = new RequestParams();
+        params.put("grp", currentTeam.getHash());
+        AteamoRestClient.get(context, scheduleUrlString, headers, params, new AsyncHttpResponseHandler() {//new RequestParams("grp", currentTeam.getHash())
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String decodedData = new String(responseBody);
+                try {
+                    JSONObject jsonObject = new JSONObject(decodedData);
+                    int tt = 0;
+                    tt++;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.d(TAG, error.getLocalizedMessage());
+                if (MainActivity.getInstance() != null){
+                    new AlertDialog.Builder(MainActivity.getInstance()).setMessage("Teams not loaded. Error: " + error.getLocalizedMessage()).create().show();
+                }
+                //TODO Заменить на нормальную работу после завершения сервера
+            }
+        });
+    }
+
+
+
     public void loadMembers() {
-        //TODO Заменить на нормальную работу после завершения сервера
-        new PostTask().execute("");
+        Team currentTeam = Team.getCurrent();
+        if (currentTeam == null) {
+            return;
+        }
+        Header[] headers = {new BasicHeader("Authorization", "Bearer " + accessToken)};
+        AteamoRestClient.get(context, membersUrlString, headers, new RequestParams("grp", currentTeam.getHash()), new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String decodedData = new String(responseBody);
+                try {
+                    JSONArray jsonArray = new JSONArray(decodedData);
+                    Member.fill(jsonArray);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.d(TAG, error.getLocalizedMessage());
+                if (MainActivity.getInstance() != null){
+                    new AlertDialog.Builder(MainActivity.getInstance()).setMessage("Teams not loaded. Error: " + error.getLocalizedMessage()).create().show();
+                }
+                //TODO Заменить на нормальную работу после завершения сервера
+                new PostTask().execute("");
+            }
+        });
     }
 
 

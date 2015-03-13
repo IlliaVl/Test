@@ -44,8 +44,8 @@ public class QBHelper {
     //
 //    private static final String USER_LOGIN = "mish";
 //    private static final String USER_LOGIN = "loca";
-//    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";//iliavl@list.ru
-    private static final String USER_LOGIN = "b8ddb9307f2911e4b5c1001851012600";//Sheldon Cooper
+    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";//iliavl@list.ru
+//    private static final String USER_LOGIN = "b8ddb9307f2911e4b5c1001851012600";//Sheldon Cooper
     //    private static final String USER_LOGIN = "illia";
     private static final String USER_PASSWORD = "qqqqqqqq";
 //    private static final String USER_LOGIN = "c02e33a07f2811e4b5c1001851012600";

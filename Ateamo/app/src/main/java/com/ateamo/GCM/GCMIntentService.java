@@ -43,15 +43,12 @@ public class GCMIntentService extends IntentService {
              * any message types you're not interested in, or that you don't
              * recognize.
              */
-            if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
+            if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
                 processNotification(Consts.GCM_SEND_ERROR, extras);
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_DELETED.equals(messageType)) {
+            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
                 processNotification(Consts.GCM_DELETED_MESSAGE, extras);
                 // If it's a regular GCM message, do some work.
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // Post notification of received message.
                 processNotification(Consts.GCM_RECEIVED, extras);
                 Log.i(TAG, "Received: " + extras.toString());
@@ -94,8 +91,7 @@ public class GCMIntentService extends IntentService {
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(
-                R.mipmap.ic_launcher).setContentTitle(Consts.GCM_NOTIFICATION).setStyle(new NotificationCompat.BigTextStyle().bigText(message)).setContentText(message);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(Consts.GCM_NOTIFICATION).setStyle(new NotificationCompat.BigTextStyle().bigText(message)).setContentText(message);
 
         mBuilder.setContentIntent(contentIntent);
         notificationManager.notify(NOTIFICATION_ID, mBuilder.build());

@@ -17,10 +17,10 @@ import java.util.ArrayList;
  * Created by vlasovia on 21.02.15.
  */
 public class Member implements Serializable {
-    private static final String HASH_ID = "hash";
-    private static final String NAME_ID = "name";
+    private static final String HASH_ID = "member_hash";
+    private static final String NAME_ID = "display_name";
     private static final String EMAIL_ID = "email";
-    private static final String PROFILE_PICTURE_ID = "img";
+    private static final String PROFILE_PICTURE_ID = "profile_img";
 
     private static ArrayList<Member> members = new ArrayList<Member>();
     private static Member current;
@@ -34,15 +34,15 @@ public class Member implements Serializable {
 
 
     public Member() {
-//        hash = "c02e33a07f2811e4b5c1001851012600";
-//        name = "Illia Vlasov";
-//        email = "iliavl@list.ru";
-//        profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/397ff121-ab0c-379b-44edef72e85eb137.jpg";
+        hash = "c02e33a07f2811e4b5c1001851012600";
+        name = "Illia Vlasov";
+        email = "iliavl@list.ru";
+        profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/397ff121-ab0c-379b-44edef72e85eb137.jpg";
 
-        hash = "b8ddb9307f2911e4b5c1001851012600";
-        name = "Sheldon Cooper";
-        email = "vkfriendslocator@gmail.com";
-        profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/3b667168-cb7a-6a7a-305623ccab9e15b5.jpg";
+//        hash = "b8ddb9307f2911e4b5c1001851012600";
+//        name = "Sheldon Cooper";
+//        email = "vkfriendslocator@gmail.com";
+//        profilePictureURL = "https://5f31800e1d2ac4a222ba-0da610d65cf2689f3fa9d0c4703b3fef.ssl.cf1.rackcdn.com/3b667168-cb7a-6a7a-305623ccab9e15b5.jpg";
     }
 
 
@@ -68,6 +68,7 @@ public class Member implements Serializable {
 
 
     static void fill(JSONArray membersJSONArray) {
+        members.clear();
         for (int index = 0; index < membersJSONArray.length(); ++index) {
             try {
                 JSONObject memberJSONObject = membersJSONArray.getJSONObject(index);
