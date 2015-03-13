@@ -76,7 +76,14 @@ public class AteamoFetcher {
                     JSONObject jsonObject = new JSONObject(decodedData);
 //                    loggedInCallback.requestResponse(jsonObject);
                     saveAuthData(jsonObject);
-                    Member.setCurrent(new Member());
+                    //TODO Заменить на нормальную работу после завершения сервера
+                    if (Member.getCurrent() == null) {
+                        Member.setCurrent(new Member());
+                    } else {
+                        if (callback != null) {
+                            callback.requestResponse(null);
+                        }
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

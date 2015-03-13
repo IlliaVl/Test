@@ -154,6 +154,10 @@ public class Member implements Serializable {
     }
 
     public static void setCurrent(Member current) {
+        //TODO Заменить на нормальную работу после завершения сервера
+        if (Member.current != null) {
+            return;
+        }
         Member.current = current;
         saveCurrentMember();
         AteamoFetcher.getSharedInstance().loadTeams();
