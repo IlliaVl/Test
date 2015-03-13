@@ -36,6 +36,7 @@ public class ChatAdapter extends BaseAdapter {
     private final List<QBChatMessage> chatMessages;
     private Activity context;
 
+
     public ChatAdapter(Activity context, List<QBChatMessage> chatMessages) {
         this.context = context;
         this.chatMessages = chatMessages;

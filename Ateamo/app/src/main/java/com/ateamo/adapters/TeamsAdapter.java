@@ -1,6 +1,7 @@
 package com.ateamo.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -20,11 +21,15 @@ import java.util.ArrayList;
 public class TeamsAdapter extends ArrayAdapter<Team> {
 
     private MainActivity mainActivity;
+    private int selectedItemPosition = -1;
+
+
 
     public TeamsAdapter(Context context, int resource, ArrayList<Team> objects) {
         super(context, resource, objects);
         mainActivity = (MainActivity) context;
     }
+
 
 
     @Override
@@ -40,7 +45,19 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
         ImageView teamBadgeImageView = (ImageView)convertView.findViewById(R.id.teamBadgeImageView);
         ImageLoader.getInstance().displayImage(team.getBadgeURL(), teamBadgeImageView);
 
+        if (position == selectedItemPosition) {
+            convertView.setBackgroundColor(Color.GRAY);
+        } else {
+            convertView.setBackgroundColor(Color.BLACK);
+        }
+
         return convertView;
     }
 
+
+
+    public void setSelectedItemPosition(int selectedItemPosition) {
+        this.selectedItemPosition = selectedItemPosition;
+        notifyDataSetChanged();
+    }
 }

@@ -84,6 +84,7 @@ public class Member implements Serializable {
 
 
     static public void fillTest() {
+        members.clear();
         String hash = "c02e33a07f2811e4b5c1001851012600";
         String name = "Illia Vlasov";
         String email = "iliavl@list.ru";

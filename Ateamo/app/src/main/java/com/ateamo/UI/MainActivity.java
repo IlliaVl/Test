@@ -198,12 +198,15 @@ public class MainActivity extends FragmentActivity {
             }
         });
         final TeamsAdapter adapter = new TeamsAdapter(this, R.layout.list_item_team, Team.getTeams());
+        int currentTeamIndex = Team.getTeams().indexOf(Team.getCurrent());
+        adapter.setSelectedItemPosition(currentTeamIndex);
         teamsListView.setAdapter(adapter);
         teamsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
                 Team team = Team.getTeams().get(position);
                 Team.setCurrent(team);
                 slidingMenu.showContent();
+                adapter.setSelectedItemPosition(position);
             }
         });
     }
