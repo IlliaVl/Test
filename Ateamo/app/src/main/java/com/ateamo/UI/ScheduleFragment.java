@@ -1,15 +1,19 @@
 package com.ateamo.UI;
 
-import android.net.Uri;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.ateamo.adapters.ScheduleAdapter;
 import com.ateamo.ateamo.R;
+import com.ateamo.core.Event;
+import com.ateamo.core.Schedule;
 
 
 /**
@@ -30,7 +34,7 @@ public class ScheduleFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private OnEventSelectedListener mListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -74,44 +78,36 @@ public class ScheduleFragment extends Fragment {
 //        badge.setTextSize(4);
 //        badge.setText("1");
 //        badge.show();
-        ListView stickyList = (ListView) view.findViewById(R.id.scheduleListView);
-
-//        stickyList = (StickyListHeadersListView) findViewById(R.id.list);
-//        stickyList.setOnItemClickListener(this);
-//        stickyList.setOnHeaderClickListener(this);
-//        stickyList.setOnStickyHeaderChangedListener(this);
-//        stickyList.setOnStickyHeaderOffsetChangedListener(this);
-//        stickyList.addHeaderView(getActivity().getLayoutInflater().inflate(R.layout.list_header, null));
-//        stickyList.addFooterView(getActivity().getLayoutInflater().inflate(R.layout.list_footer, null));
-////        stickyList.setEmptyView(findViewById(R.id.empty));
-//        stickyList.setDrawingListUnderStickyHeader(true);
-//        stickyList.setAreHeadersSticky(true);
-
-
+        ListView listView = (ListView) view.findViewById(R.id.scheduleListView);
         ScheduleAdapter adapter = new ScheduleAdapter(getActivity());
-        stickyList.setAdapter(adapter);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mListener != null) {
+                    mListener.onEventSelected(position);
+                }
+//                Event selectedEvent = Schedule.getSchedule().get(position);
+//                EventFragment nextFrag= new EventFragment();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                final FragmentTransaction add;
+//                add = fragmentTransaction.add(R.id.realtabcontent, new EventFragment(), EVENT_FRAGMENT_ID);
+            }
+        });
         return view;
     }
 
-
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnEventSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
         }
     }
 
-//    @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        try {
-//            mListener = (OnFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
+
 
     @Override
     public void onDetach() {
@@ -119,19 +115,9 @@ public class ScheduleFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }
 
+
+    public interface OnEventSelectedListener {
+        public void onEventSelected(int position);
+    }
 }
