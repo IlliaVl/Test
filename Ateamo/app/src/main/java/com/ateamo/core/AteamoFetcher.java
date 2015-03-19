@@ -85,7 +85,6 @@ public class AteamoFetcher {
                             callback.requestResponse(null);
                         }
                     }
-                    loadSchedule();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -136,6 +135,7 @@ public class AteamoFetcher {
                     if (callback != null) {
                         callback.requestResponse(null);
                     }
+                    loadSchedule();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -172,6 +172,7 @@ public class AteamoFetcher {
                 String decodedData = new String(responseBody);
                 try {
                     JSONObject jsonObject = new JSONObject(decodedData);
+                    Schedule.fill(jsonObject);
                     int tt = 0;
                     tt++;
                 } catch (JSONException e) {

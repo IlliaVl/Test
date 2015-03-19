@@ -6,11 +6,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.ListView;
 
+import com.ateamo.adapters.ScheduleAdapter;
 import com.ateamo.ateamo.R;
-
-import viewbadger.BadgeView;
 
 
 /**
@@ -70,11 +69,27 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
         // Inflate the layout for this fragment
-        ImageButton attachmentButton = (ImageButton) view.findViewById(R.id.imageButton4);
-        BadgeView badge = new BadgeView(getActivity(), attachmentButton);
-        badge.setTextSize(4);
-        badge.setText("1");
-        badge.show();
+//        ImageButton attachmentButton = (ImageButton) view.findViewById(R.id.imageButton4);
+//        BadgeView badge = new BadgeView(getActivity(), attachmentButton);
+//        badge.setTextSize(4);
+//        badge.setText("1");
+//        badge.show();
+        ListView stickyList = (ListView) view.findViewById(R.id.scheduleListView);
+
+//        stickyList = (StickyListHeadersListView) findViewById(R.id.list);
+//        stickyList.setOnItemClickListener(this);
+//        stickyList.setOnHeaderClickListener(this);
+//        stickyList.setOnStickyHeaderChangedListener(this);
+//        stickyList.setOnStickyHeaderOffsetChangedListener(this);
+//        stickyList.addHeaderView(getActivity().getLayoutInflater().inflate(R.layout.list_header, null));
+//        stickyList.addFooterView(getActivity().getLayoutInflater().inflate(R.layout.list_footer, null));
+////        stickyList.setEmptyView(findViewById(R.id.empty));
+//        stickyList.setDrawingListUnderStickyHeader(true);
+//        stickyList.setAreHeadersSticky(true);
+
+
+        ScheduleAdapter adapter = new ScheduleAdapter(getActivity());
+        stickyList.setAdapter(adapter);
         return view;
     }
 

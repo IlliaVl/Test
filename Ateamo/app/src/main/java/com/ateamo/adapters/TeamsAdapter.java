@@ -2,6 +2,7 @@ package com.ateamo.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
  * Created by vlasovia on 25.02.15.
  */
 public class TeamsAdapter extends ArrayAdapter<Team> {
+    private static String TAG = "TEAMS ADAPTER";
 
     private MainActivity mainActivity;
     private int selectedItemPosition = -1;
@@ -34,6 +36,7 @@ public class TeamsAdapter extends ArrayAdapter<Team> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.i(TAG, "Position: " + position);
         if(convertView == null) {
             convertView = mainActivity.getLayoutInflater().inflate(R.layout.list_item_team, parent, false);
         }

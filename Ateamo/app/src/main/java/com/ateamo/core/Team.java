@@ -49,6 +49,14 @@ public class Team {
 
 
 
+    Team(String hash, String name, String badgeURL) {
+        this.hash = hash;
+        this.name = name;
+        this.badgeURL = badgeURL;
+    }
+
+
+
     static void fill(JSONArray teamsJSONArray) {
         //TODO Заменить на нормальную работу после завершения сервера. teamsJSONArray != null - передаем null, ибо не залогинены в Ateamo
         if (teamsJSONArray != null) {
