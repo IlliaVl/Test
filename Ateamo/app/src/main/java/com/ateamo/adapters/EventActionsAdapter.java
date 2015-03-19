@@ -85,6 +85,7 @@ class Action {
 
 
     public static ArrayList<Action> initActions(Event event) {
+        actions.clear();
         actions.add(new Action(R.drawable.checkmark_black, "View RSVPs", "Number of RSVPs"));
         actions.add(new Action(R.drawable.map, "Get Directions", event.getVenue().getAddress()));
         actions.add(new Action(R.drawable.notification, "Send a Reminder", "666 people have not responded"));
