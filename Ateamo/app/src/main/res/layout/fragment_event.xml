@@ -52,7 +52,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/homeBadgeImageView"
             android:layout_centerHorizontal="true"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:id="@+id/linearLayout3">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -100,6 +101,13 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:textColor="#646363" />
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/actionsListView"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/linearLayout3" />
 
     </RelativeLayout>
 </LinearLayout>

@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.ateamo.adapters.EventActionsAdapter;
 import com.ateamo.ateamo.R;
 import com.ateamo.core.Event;
 import com.ateamo.core.Schedule;
@@ -66,6 +68,10 @@ public class EventFragment extends Fragment {
         initTextView(view, R.id.homeNameTextView, event.getHome().getName());
 
         initTextView(view, R.id.visitorNameTextView, event.getVisitor().getName());
+
+        ListView actionsListView = (ListView) view.findViewById(R.id.actionsListView);
+        EventActionsAdapter actionsAdapter = new EventActionsAdapter(getActivity(), event);
+        actionsListView.setAdapter(actionsAdapter);
 
         return view;
     }
