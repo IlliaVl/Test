@@ -25,6 +25,7 @@ public class ScheduleAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
     private ArrayList<Event> schedule;
+    private ArrayList<String> datesStrings;
     private TreeSet sectionIndices;
 
 
@@ -32,6 +33,7 @@ public class ScheduleAdapter extends BaseAdapter {
     public ScheduleAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         schedule = Schedule.getSchedule();
+        datesStrings = Schedule.getDatesStrings();
         sectionIndices = Schedule.getIndices();
         Log.i(TAG, "Schedule size: " + schedule.size());
     }
@@ -111,8 +113,7 @@ public class ScheduleAdapter extends BaseAdapter {
                 } else {
                     sectionViewHolder = (SectionViewHolder) view.getTag();
                 }
-                String scheduleHeaderText = "September";
-                sectionViewHolder.scheduleHeaderTextView.setText(scheduleHeaderText);
+                sectionViewHolder.scheduleSectorTextView.setText(datesStrings.get(position));
                 break;
         }
 
@@ -124,14 +125,14 @@ public class ScheduleAdapter extends BaseAdapter {
 
     private SectionViewHolder createSectionViewHolder(View v) {
         SectionViewHolder holder = new SectionViewHolder();
-        holder.scheduleHeaderTextView = (TextView) v.findViewById(R.id.scheduleHeaderTextView);
+        holder.scheduleSectorTextView = (TextView) v.findViewById(R.id.scheduleSectorTextView);
         return holder;
     }
 
 
 
     private static class SectionViewHolder {
-        TextView scheduleHeaderTextView;
+        TextView scheduleSectorTextView;
     }
 
 

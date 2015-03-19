@@ -9,7 +9,7 @@
         android:layout_height="30dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Large Text"
-        android:id="@+id/scheduleHeaderTextView"
+        android:id="@+id/scheduleSectorTextView"
         android:layout_gravity="center_horizontal"
         android:textColor="#ffffffff"
         android:textSize="15dp"

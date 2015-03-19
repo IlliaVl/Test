@@ -21,6 +21,7 @@ public class Schedule {
 //    private static HashMap<String, Event> teams = new HashMap<String, Event>();
     private static ArrayList<Event> schedule = new ArrayList<Event>();
     private static ArrayList<Date> dates = new ArrayList<Date>();
+    private static ArrayList<String> datesStrings = new ArrayList<String>();
 //    private static ArrayList<Integer> indices = new ArrayList<Integer>();
     private static TreeSet indices = new TreeSet();
 
@@ -56,6 +57,8 @@ public class Schedule {
             try {
                 Date date = format.parse(dateString);
                 dates.add(date);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d");
+                datesStrings.add(simpleDateFormat.format(date));
                 indices.add(schedule.size());//if schedule array has null items as blank sections for list view
 //                indices.add(schedule.size() + indices.size());
                 schedule.add(null);//if schedule array has null items as blank sections for list view
@@ -67,6 +70,7 @@ public class Schedule {
                 JSONObject eventJSONObject = eventsJsonArray.getJSONObject(index);
                 Event event = new Event(eventsJsonArray.getJSONObject(index));
                 schedule.add(event);
+                datesStrings.add(null);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -113,5 +117,9 @@ public class Schedule {
 //            indices[i] = Schedule.indices.get(i).intValue();
 //        }
         return indices;
+    }
+
+    public static ArrayList<String> getDatesStrings() {
+        return datesStrings;
     }
 }

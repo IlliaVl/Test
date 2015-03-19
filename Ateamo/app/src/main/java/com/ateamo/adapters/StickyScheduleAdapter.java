@@ -142,7 +142,7 @@ public class StickyScheduleAdapter extends BaseAdapter implements StickyListHead
 
     private HeaderViewHolder createHeaderViewHolder(View v) {
         HeaderViewHolder holder = new HeaderViewHolder();
-        holder.scheduleHeaderTextView = (TextView) v.findViewById(R.id.scheduleHeaderTextView);
+        holder.scheduleHeaderTextView = (TextView) v.findViewById(R.id.scheduleSectorTextView);
         return holder;
     }
 
