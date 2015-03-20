@@ -15,6 +15,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ateamo.adapters.Action;
 import com.ateamo.adapters.MembersAdapter;
 import com.ateamo.adapters.TeamsAdapter;
 import com.ateamo.ateamo.R;
@@ -314,7 +315,9 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
 
 
     @Override
-    public void onEventSelected(int position, FragmentType fragmentType) {
+    public void onEventSelected(Bundle parametersBundle) {
+        FragmentType fragmentType = FragmentType.values()[parametersBundle.getInt(OnSelectedItemListener.FRAGMENT_TYPE_PARAMETER_ID)];
+        int position = parametersBundle.getInt(OnSelectedItemListener.POSITION_PARAMETER_ID);
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         switch (fragmentType) {
@@ -322,7 +325,15 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
                 fragmentTransaction.replace(R.id.realtabcontent, EventFragment.newInstance(position), EVENT_FRAGMENT_ID);
                 break;
             case EVENT:
-                fragmentTransaction.replace(R.id.realtabcontent, AteamoMapFragment.newInstance(position), MAP_FRAGMENT_ID);
+                Action.ActionType actionType = Action.ActionType.values()[position];
+                switch (actionType) {
+                    case GET_DIRECTION:
+                        int eventPosition = parametersBundle.getInt(OnSelectedItemListener.EVENT_POSITION_PARAMETER_ID);
+                        fragmentTransaction.replace(R.id.realtabcontent, AteamoMapFragment.newInstance(eventPosition), MAP_FRAGMENT_ID);
+                        break;
+                    default:
+                        return;
+                }
                 break;
         }
         fragmentTransaction.addToBackStack(null);

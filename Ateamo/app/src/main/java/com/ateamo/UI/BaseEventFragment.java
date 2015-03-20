@@ -20,22 +20,32 @@ public class BaseEventFragment extends Fragment {
     protected int viewId;
     protected int listViewId;
     protected BaseAdapter listAdapter;
+    Bundle parametersBundle;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        parametersBundle = new Bundle();
         View view = inflater.inflate(viewId, container, false);
         ListView listView = (ListView) view.findViewById(listViewId);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (selectedItemListener != null) {
-                    selectedItemListener.onEventSelected(position, type);
-                }
+                parametersBundle.clear();
+                itemSelected(position);
             }
         });
         return view;
+    }
+
+
+    protected void itemSelected(int position) {
+        if (selectedItemListener != null) {
+            parametersBundle.putInt(OnSelectedItemListener.POSITION_PARAMETER_ID, position);
+            parametersBundle.putInt(OnSelectedItemListener.FRAGMENT_TYPE_PARAMETER_ID, type.ordinal());
+            selectedItemListener.onEventSelected(parametersBundle);
+        }
     }
 
 

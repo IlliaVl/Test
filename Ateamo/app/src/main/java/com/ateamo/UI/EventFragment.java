@@ -21,6 +21,7 @@ public class EventFragment extends BaseEventFragment {
     private static final String EVENT_POSITION_ID = "eventPosition";
 
     private Event event;
+    private int eventPosition;
 
 
     public static EventFragment newInstance(int eventPosition) {
@@ -36,7 +37,7 @@ public class EventFragment extends BaseEventFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            int eventPosition = getArguments().getInt(EVENT_POSITION_ID);
+            eventPosition = getArguments().getInt(EVENT_POSITION_ID);
             event = Schedule.getSchedule().get(eventPosition);
         }
     }
@@ -67,6 +68,13 @@ public class EventFragment extends BaseEventFragment {
         initTextView(view, R.id.visitorNameTextView, event.getVisitor().getName());
 
         return view;
+    }
+
+
+    @Override
+    protected void itemSelected(int position) {
+        parametersBundle.putInt(OnSelectedItemListener.EVENT_POSITION_PARAMETER_ID, eventPosition);
+        super.itemSelected(position);
     }
 
 

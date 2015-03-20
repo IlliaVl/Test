@@ -56,4 +56,13 @@ public class AteamoMapFragment extends android.support.v4.app.Fragment implement
         googleMap.addMarker(new MarkerOptions().position(eventLocation).title(event.getVenue().getName()));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation, 15));
     }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        MapFragment mapFragment = (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null)
+            getActivity().getFragmentManager().beginTransaction().remove(mapFragment).commit();
+    }
 }
