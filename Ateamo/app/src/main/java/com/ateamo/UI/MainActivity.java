@@ -28,14 +28,14 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 
-
-public class MainActivity extends FragmentActivity implements ScheduleFragment.OnEventSelectedListener {
+public class MainActivity extends FragmentActivity implements OnSelectedItemListener {
     private static MainActivity instance = null;
 
     private final int SCHEDULE_TAB_NUMBER = 0;
     private final int CHAT_TAB_NUMBER = 1;
 
     private final String EVENT_FRAGMENT_ID = "EventFragment";
+    private final String MAP_FRAGMENT_ID = "MapFragment";
     private final String SCHEDULE_TAB_ID = "schedule";
     private final String SCHEDULE_TAB_NAME_ID = "Schedule";
     private final String NOTIFICATIONS_TAB_ID = "notifications";
@@ -314,20 +314,18 @@ public class MainActivity extends FragmentActivity implements ScheduleFragment.O
 
 
     @Override
-    public void onEventSelected(int position) {
+    public void onEventSelected(int position, FragmentType fragmentType) {
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-//        ScheduleFragment scheduleFragment = (ScheduleFragment) fragmentManager.findFragmentByTag(SCHEDULE_TAB_ID);
-//        NotificationsFragment notificationsFragment = (NotificationsFragment) fragmentManager.findFragmentByTag(NOTIFICATIONS_TAB_ID);
-//        PaymentsFragment paymentsFragment = (PaymentsFragment) fragmentManager.findFragmentByTag(PAYMENTS_TAB_ID);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.realtabcontent, EventFragment.newInstance(position), EVENT_FRAGMENT_ID);
+        switch (fragmentType) {
+            case SCHEDULE:
+                fragmentTransaction.replace(R.id.realtabcontent, EventFragment.newInstance(position), EVENT_FRAGMENT_ID);
+                break;
+            case EVENT:
+                fragmentTransaction.replace(R.id.realtabcontent, MapFragment.newInstance(position), MAP_FRAGMENT_ID);
+                break;
+        }
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-
-//        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-//        Event selectedEvent = Schedule.getSchedule().get(position);
-//        EventFragment nextFrag= new EventFragment();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.replace(R.id.realtabcontent, new EventFragment(), EVENT_FRAGMENT_ID);
     }
 }

@@ -1,12 +1,10 @@
 package com.ateamo.UI;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ateamo.adapters.EventActionsAdapter;
@@ -19,12 +17,10 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class EventFragment extends Fragment {
+public class EventFragment extends BaseEventFragment {
     private static final String EVENT_POSITION_ID = "eventPosition";
 
     private Event event;
-
-//    private OnFragmentInteractionListener mListener;
 
 
 
@@ -51,7 +47,11 @@ public class EventFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_event, container, false);
+        type = OnSelectedItemListener.FragmentType.EVENT;
+        viewId = R.layout.fragment_event;
+        listViewId = R.id.actionsListView;
+        listAdapter = new EventActionsAdapter(getActivity(), event);
+        View view = super.onCreateView(inflater, container, savedInstanceState);
 
         Date eventDate = event.getDate();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d");
@@ -69,10 +69,6 @@ public class EventFragment extends Fragment {
 
         initTextView(view, R.id.visitorNameTextView, event.getVisitor().getName());
 
-        ListView actionsListView = (ListView) view.findViewById(R.id.actionsListView);
-        EventActionsAdapter actionsAdapter = new EventActionsAdapter(getActivity(), event);
-        actionsListView.setAdapter(actionsAdapter);
-
         return view;
     }
 
@@ -89,39 +85,5 @@ public class EventFragment extends Fragment {
         TextView textView = (TextView) view.findViewById(id);
         textView.setText(text);
     }
-//
-//
-//
-//    @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        try {
-//            mListener = (OnFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        mListener = null;
-//    }
-//
-//    /**
-//     * This interface must be implemented by activities that contain this
-//     * fragment to allow an interaction in this fragment to be communicated
-//     * to the activity and potentially other fragments contained in that
-//     * activity.
-//     * <p/>
-//     * See the Android Training lesson <a href=
-//     * "http://developer.android.com/training/basics/fragments/communicating.html"
-//     * >Communicating with Other Fragments</a> for more information.
-//     */
-//    public interface OnFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        public void onFragmentInteraction(Uri uri);
-//    }
 
 }
