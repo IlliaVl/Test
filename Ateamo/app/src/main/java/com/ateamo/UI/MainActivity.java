@@ -322,7 +322,7 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
                 fragmentTransaction.replace(R.id.realtabcontent, EventFragment.newInstance(position), EVENT_FRAGMENT_ID);
                 break;
             case EVENT:
-                fragmentTransaction.replace(R.id.realtabcontent, MapFragment.newInstance(position), MAP_FRAGMENT_ID);
+                fragmentTransaction.replace(R.id.realtabcontent, AteamoMapFragment.newInstance(position), MAP_FRAGMENT_ID);
                 break;
         }
         fragmentTransaction.addToBackStack(null);

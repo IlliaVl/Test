@@ -39,7 +39,6 @@ public class BaseEventFragment extends Fragment {
     }
 
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -49,7 +48,6 @@ public class BaseEventFragment extends Fragment {
             throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
         }
     }
-
 
 
     @Override

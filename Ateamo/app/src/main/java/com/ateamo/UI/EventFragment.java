@@ -23,7 +23,6 @@ public class EventFragment extends BaseEventFragment {
     private Event event;
 
 
-
     public static EventFragment newInstance(int eventPosition) {
         EventFragment fragment = new EventFragment();
         Bundle args = new Bundle();
@@ -31,7 +30,6 @@ public class EventFragment extends BaseEventFragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
 
     @Override
@@ -42,7 +40,6 @@ public class EventFragment extends BaseEventFragment {
             event = Schedule.getSchedule().get(eventPosition);
         }
     }
-
 
 
     @Override
@@ -73,12 +70,10 @@ public class EventFragment extends BaseEventFragment {
     }
 
 
-
     private void initBadge(View view, int id, Team team) {
         ImageView badgeImageView = (ImageView) view.findViewById(id);
         ImageLoader.getInstance().displayImage(team.getBadgeURL(), badgeImageView);
     }
-
 
 
     private void initTextView(View view, int id, String text) {
