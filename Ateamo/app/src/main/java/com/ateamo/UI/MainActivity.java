@@ -3,6 +3,7 @@ package com.ateamo.UI;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -82,50 +83,38 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
                 chatFragment = (ChatFragment) fragmentManager.findFragmentByTag(CHAT_TAB_ID);
                 PaymentsFragment paymentsFragment = (PaymentsFragment) fragmentManager.findFragmentByTag(PAYMENTS_TAB_ID);
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                if(scheduleFragment != null) {
-                    fragmentTransaction.detach(scheduleFragment);
-                }
-                if(notificationsFragment != null) {
-                    fragmentTransaction.detach(notificationsFragment);
-                }
-                if(chatFragment != null) {
-                    fragmentTransaction.detach(chatFragment);
-                }
-                if(paymentsFragment != null) {
-                    fragmentTransaction.detach(paymentsFragment);
-                }
-
+                Fragment fragment = null;
+                int container;
+                String id = SCHEDULE_TAB_ID;
                 if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)) {
                     if(scheduleFragment == null){
-                        fragmentTransaction.add(R.id.realtabcontent, new ScheduleFragment(), SCHEDULE_TAB_ID);
-                    } else {
-                        fragmentTransaction.attach(scheduleFragment);
+                        scheduleFragment = new ScheduleFragment();
                     }
-
+                    fragment = scheduleFragment;
                 } else if (tabId.equalsIgnoreCase(NOTIFICATIONS_TAB_ID)) {
                     if(notificationsFragment == null) {
                         notificationsFragment = new NotificationsFragment();
-                        fragmentTransaction.add(R.id.realtabcontent, notificationsFragment, NOTIFICATIONS_TAB_ID);
-                    } else {
-                        fragmentTransaction.attach(notificationsFragment);
                     }
+                    fragment = notificationsFragment;
+                    id = NOTIFICATIONS_TAB_ID;
                 } else if (tabId.equalsIgnoreCase(CHAT_TAB_ID)) {
                     if(chatFragment == null) {
                         chatFragment = new ChatFragment();
                         chatFragment.setDialog(QBHelper.getSharedInstance().getCurrentTeamDialog());
-                        fragmentTransaction.add(R.id.realtabcontent, chatFragment, CHAT_TAB_ID);
-                    } else {
-                        fragmentTransaction.attach(chatFragment);
                     }
+                    fragment = chatFragment;
+                    id = CHAT_TAB_ID;
                 } else if (tabId.equalsIgnoreCase(PAYMENTS_TAB_ID)) {
                     if(paymentsFragment == null) {
                         paymentsFragment = new PaymentsFragment();
-                        fragmentTransaction.add(R.id.realtabcontent, paymentsFragment, PAYMENTS_TAB_ID);
-                    } else {
-                        fragmentTransaction.attach(paymentsFragment);
                     }
+                    fragment = paymentsFragment;
+                    id = PAYMENTS_TAB_ID;
                 }
+
+                fragmentTransaction.replace(R.id.realtabcontent, fragment, id);
+                fragmentTransaction.addToBackStack(null);
+
                 fragmentTransaction.commit();
             }
         };
