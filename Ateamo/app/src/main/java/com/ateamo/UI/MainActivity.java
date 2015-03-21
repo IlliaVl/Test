@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -48,7 +47,11 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     private final String PAYMENTS_TAB_NAME_ID = "Payments";
 
     private SlidingMenu slidingMenu;
+    private ScheduleFragment scheduleFragment;
+    private NotificationsFragment notificationsFragment;
     private ChatFragment chatFragment;
+    private PaymentsFragment paymentsFragment;
+    private Fragment currentParentFragment;
     private TabHost tabHost;
 
     private TextView currentTeamNameTextView;
@@ -77,45 +80,43 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
 
             @Override
             public void onTabChanged(String tabId) {
+                FragmentTransactionManager fragmentTransactionManager = FragmentTransactionManager.getInstance();
                 android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-                ScheduleFragment scheduleFragment = (ScheduleFragment) fragmentManager.findFragmentByTag(SCHEDULE_TAB_ID);
-                NotificationsFragment notificationsFragment = (NotificationsFragment) fragmentManager.findFragmentByTag(NOTIFICATIONS_TAB_ID);
+                scheduleFragment = (ScheduleFragment) fragmentManager.findFragmentByTag(SCHEDULE_TAB_ID);
+                notificationsFragment = (NotificationsFragment) fragmentManager.findFragmentByTag(NOTIFICATIONS_TAB_ID);
                 chatFragment = (ChatFragment) fragmentManager.findFragmentByTag(CHAT_TAB_ID);
-                PaymentsFragment paymentsFragment = (PaymentsFragment) fragmentManager.findFragmentByTag(PAYMENTS_TAB_ID);
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                Fragment fragment = null;
-                int container;
+                paymentsFragment = (PaymentsFragment) fragmentManager.findFragmentByTag(PAYMENTS_TAB_ID);
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 String id = SCHEDULE_TAB_ID;
                 if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)) {
                     if(scheduleFragment == null){
                         scheduleFragment = new ScheduleFragment();
                     }
-                    fragment = scheduleFragment;
+                    currentParentFragment = scheduleFragment;
                 } else if (tabId.equalsIgnoreCase(NOTIFICATIONS_TAB_ID)) {
                     if(notificationsFragment == null) {
                         notificationsFragment = new NotificationsFragment();
                     }
-                    fragment = notificationsFragment;
+                    currentParentFragment = notificationsFragment;
                     id = NOTIFICATIONS_TAB_ID;
                 } else if (tabId.equalsIgnoreCase(CHAT_TAB_ID)) {
                     if(chatFragment == null) {
                         chatFragment = new ChatFragment();
                         chatFragment.setDialog(QBHelper.getSharedInstance().getCurrentTeamDialog());
                     }
-                    fragment = chatFragment;
+                    currentParentFragment = chatFragment;
                     id = CHAT_TAB_ID;
                 } else if (tabId.equalsIgnoreCase(PAYMENTS_TAB_ID)) {
                     if(paymentsFragment == null) {
                         paymentsFragment = new PaymentsFragment();
                     }
-                    fragment = paymentsFragment;
+                    currentParentFragment = paymentsFragment;
                     id = PAYMENTS_TAB_ID;
                 }
-
-                fragmentTransaction.replace(R.id.realtabcontent, fragment, id);
-                fragmentTransaction.addToBackStack(null);
-
-                fragmentTransaction.commit();
+                fragmentTransactionManager.push(null, null, currentParentFragment, fragmentManager);
+                fragmentTransactionManager.performTransaction(currentParentFragment, id, fragmentManager);
+//                fragmentTransaction.replace(R.id.realtabcontent, fragment, id);
+//                fragmentTransaction.commit();
             }
         };
         tabHost.setOnTabChangedListener(tabChangeListener);
@@ -307,25 +308,33 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     public void onEventSelected(Bundle parametersBundle) {
         FragmentType fragmentType = FragmentType.values()[parametersBundle.getInt(OnSelectedItemListener.FRAGMENT_TYPE_PARAMETER_ID)];
         int position = parametersBundle.getInt(OnSelectedItemListener.POSITION_PARAMETER_ID);
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Fragment fragment = null;
+        String fragmentId = "";
         switch (fragmentType) {
             case SCHEDULE:
-                fragmentTransaction.replace(R.id.realtabcontent, EventFragment.newInstance(position), EVENT_FRAGMENT_ID);
+                fragment = EventFragment.newInstance(position);
+                fragmentId = EVENT_FRAGMENT_ID;
                 break;
             case EVENT:
                 Action.ActionType actionType = Action.ActionType.values()[position];
                 switch (actionType) {
                     case GET_DIRECTION:
                         int eventPosition = parametersBundle.getInt(OnSelectedItemListener.EVENT_POSITION_PARAMETER_ID);
-                        fragmentTransaction.replace(R.id.realtabcontent, AteamoMapFragment.newInstance(eventPosition), MAP_FRAGMENT_ID);
+                        fragment = AteamoMapFragment.newInstance(eventPosition);
+                        fragmentId = MAP_FRAGMENT_ID;
                         break;
                     default:
                         return;
                 }
                 break;
         }
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        FragmentTransactionManager.getInstance().push(fragment, fragmentId, currentParentFragment, getSupportFragmentManager());
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        FragmentTransactionManager.getInstance().pop(currentParentFragment);
     }
 }
