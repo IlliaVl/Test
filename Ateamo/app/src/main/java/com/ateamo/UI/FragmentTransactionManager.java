@@ -16,7 +16,6 @@ public class FragmentTransactionManager {
     static private FragmentTransactionManager instance = new FragmentTransactionManager();
 
     private HashMap<Fragment, ArrayList<FragmentWithId>> fragmentsMap = new HashMap<>();
-    private ArrayList<FragmentWithId> currentFragments = null;
 
 
 
@@ -29,40 +28,41 @@ public class FragmentTransactionManager {
         if (fragment != null) {
             fragmentsArray.add(new FragmentWithId(fragmentId, fragment));
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.realtabcontent, fragment);
+            fragmentTransaction.replace(R.id.realtabcontent, fragment, fragmentId);
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         }
     }
 
 
-    public void pop(Fragment parent) {
+    public boolean pop(Fragment parent) {
         ArrayList<FragmentWithId> fragmentsArray = fragmentsMap.get(parent);
         if (fragmentsArray != null && fragmentsArray.size() > 0) {
             fragmentsArray.remove(fragmentsArray.size() - 1);
+            return true;
         }
+        return false;
     }
 
 
     public void performTransaction(Fragment parent, String id, FragmentManager fragmentManager) {
+        for(int index = 0; index < fragmentManager.getBackStackEntryCount(); ++index) {
+            fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.realtabcontent, parent, id);
+        fragmentTransaction.commit();
         ArrayList<FragmentWithId> fragmentsArray = fragmentsMap.get(parent);
         if (fragmentsArray != null && fragmentsArray.size() > 0) {
-            if (currentFragments != null) {
-                for (int index = 0; index < currentFragments.size(); ++index) {
-                    FragmentWithId fragmentWithId = currentFragments.get(index);
-                    fragmentTransaction.detach(fragmentWithId.getFragment());
-                }
-            }
-            currentFragments = fragmentsArray;
             for (int index = 0; index < fragmentsArray.size(); ++index) {
+                fragmentTransaction = fragmentManager.beginTransaction();
                 FragmentWithId fragmentWithId = fragmentsArray.get(index);
                 fragmentTransaction.replace(R.id.realtabcontent, fragmentWithId.getFragment());
                 fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         }
-        fragmentTransaction.commit();
     }
 
 

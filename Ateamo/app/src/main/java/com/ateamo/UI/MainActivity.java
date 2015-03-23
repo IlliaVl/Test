@@ -80,13 +80,6 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
 
             @Override
             public void onTabChanged(String tabId) {
-                FragmentTransactionManager fragmentTransactionManager = FragmentTransactionManager.getInstance();
-                android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-                scheduleFragment = (ScheduleFragment) fragmentManager.findFragmentByTag(SCHEDULE_TAB_ID);
-                notificationsFragment = (NotificationsFragment) fragmentManager.findFragmentByTag(NOTIFICATIONS_TAB_ID);
-                chatFragment = (ChatFragment) fragmentManager.findFragmentByTag(CHAT_TAB_ID);
-                paymentsFragment = (PaymentsFragment) fragmentManager.findFragmentByTag(PAYMENTS_TAB_ID);
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 String id = SCHEDULE_TAB_ID;
                 if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)) {
                     if(scheduleFragment == null){
@@ -113,10 +106,10 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
                     currentParentFragment = paymentsFragment;
                     id = PAYMENTS_TAB_ID;
                 }
+                FragmentTransactionManager fragmentTransactionManager = FragmentTransactionManager.getInstance();
+                android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentTransactionManager.push(null, null, currentParentFragment, fragmentManager);
                 fragmentTransactionManager.performTransaction(currentParentFragment, id, fragmentManager);
-//                fragmentTransaction.replace(R.id.realtabcontent, fragment, id);
-//                fragmentTransaction.commit();
             }
         };
         tabHost.setOnTabChangedListener(tabChangeListener);
@@ -334,7 +327,8 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        FragmentTransactionManager.getInstance().pop(currentParentFragment);
+        if (FragmentTransactionManager.getInstance().pop(currentParentFragment)) {
+            super.onBackPressed();
+        }
     }
 }
