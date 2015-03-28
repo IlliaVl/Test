@@ -57,6 +57,10 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     private TextView currentTeamNameTextView;
 
 
+    public static MainActivity getInstance() {
+        return instance;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +76,6 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     }
 
 
-
     private void initTabs() {
         tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
@@ -81,26 +84,26 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
             @Override
             public void onTabChanged(String tabId) {
                 String id = SCHEDULE_TAB_ID;
-                if(tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)) {
-                    if(scheduleFragment == null){
+                if (tabId.equalsIgnoreCase(SCHEDULE_TAB_ID)) {
+                    if (scheduleFragment == null) {
                         scheduleFragment = new ScheduleFragment();
                     }
                     currentParentFragment = scheduleFragment;
                 } else if (tabId.equalsIgnoreCase(NOTIFICATIONS_TAB_ID)) {
-                    if(notificationsFragment == null) {
+                    if (notificationsFragment == null) {
                         notificationsFragment = new NotificationsFragment();
                     }
                     currentParentFragment = notificationsFragment;
                     id = NOTIFICATIONS_TAB_ID;
                 } else if (tabId.equalsIgnoreCase(CHAT_TAB_ID)) {
-                    if(chatFragment == null) {
+                    if (chatFragment == null) {
                         chatFragment = new ChatFragment();
                         chatFragment.setDialog(QBHelper.getSharedInstance().getCurrentTeamDialog());
                     }
                     currentParentFragment = chatFragment;
                     id = CHAT_TAB_ID;
                 } else if (tabId.equalsIgnoreCase(PAYMENTS_TAB_ID)) {
-                    if(paymentsFragment == null) {
+                    if (paymentsFragment == null) {
                         paymentsFragment = new PaymentsFragment();
                     }
                     currentParentFragment = paymentsFragment;
@@ -120,17 +123,15 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     }
 
 
-
     private TabHost.TabSpec getTabSpec(TabHost.TabSpec tabSpec, String tabName, int tabIcon) {
         View view = LayoutInflater.from(this).inflate(R.layout.tab_item, null);
         view.setBackgroundResource(R.drawable.tab_indicator);
-        ((TextView)view.findViewById(R.id.tabTextView)).setText(tabName);
-        ((ImageView)view.findViewById(R.id.tabImageView)).setBackgroundResource(tabIcon);
+        ((TextView) view.findViewById(R.id.tabTextView)).setText(tabName);
+        ((ImageView) view.findViewById(R.id.tabImageView)).setBackgroundResource(tabIcon);
         tabSpec.setContent(new TabContent(getBaseContext()));
         tabSpec.setIndicator(view);
         return tabSpec;
     }
-
 
 
     private void initImageLoader() {
@@ -139,7 +140,7 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     }
 
 
-//region Menu Methods
+    //region Menu Methods
     private void initMenus() {
         slidingMenu = new SlidingMenu(this);
         slidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
@@ -156,13 +157,11 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     }
 
 
-
-//region LeftMenu Methods
+    //region LeftMenu Methods
     private void fillMenus() {
         fillLeftMenu();
         fillRightMenu();
     }
-
 
 
     public void fillLeftMenu() {
@@ -197,15 +196,13 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     }
 
 
-
     public void openLeftMenu(View view) {
         slidingMenu.showMenu();
     }
 //endregion
 
 
-
-//region RightMenu Methods
+    //region RightMenu Methods
     public void fillRightMenu() {
         if (Team.getCurrent() != null) {
             final ImageView currentTeamBadgeImageView = (ImageView) findViewById(R.id.currentTeamBadgeImageView);
@@ -230,13 +227,17 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     }
 
 
-
     public void openRightMenu(View view) {
         slidingMenu.showSecondaryMenu();
     }
-//endregion
-//endregion
 
+
+    public void addPlayers(View view) {
+        Intent intent = new Intent(this, AddPlayersActivity.class);
+        startActivity(intent);
+    }
+//endregion
+//endregion
 
 
     public Uri getAttachmentUri() {
@@ -249,13 +250,11 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
     }
 
 
-
     public void clearAttachment() {
         if (chatFragment != null) {
             chatFragment.clearAttachment();
         }
     }
-
 
 
     public void refreshChat() {
@@ -269,11 +268,11 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
 //endregion
 
 
-
-    public static MainActivity getInstance() {
-        return instance;
+    public void updateSchedule() {
+        if (scheduleFragment != null) {
+            scheduleFragment.update();
+        }
     }
-
 
 
     public void currentTeamChanged(Team team) {
@@ -294,7 +293,6 @@ public class MainActivity extends FragmentActivity implements OnSelectedItemList
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
         }
     }
-
 
 
     @Override

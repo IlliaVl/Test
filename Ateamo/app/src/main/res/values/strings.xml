@@ -43,5 +43,6 @@
         <item>Women\'s</item>
     </string-array>
     <string name="title_activity_private_chat">PrivateChatActivity</string>
+    <string name="title_activity_add_players">AddPlayersActivity</string>
 
 </resources>

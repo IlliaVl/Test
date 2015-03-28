@@ -1,5 +1,7 @@
 package com.ateamo.core;
 
+import com.ateamo.UI.MainActivity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,39 +20,41 @@ public class Schedule {
     private static final String DATE_ID = "date";
     private static final String EVENTS_ID = "events";//json object
 
-//    private static HashMap<String, Event> teams = new HashMap<String, Event>();
+    //    private static HashMap<String, Event> teams = new HashMap<String, Event>();
     private static ArrayList<Event> schedule = new ArrayList<Event>();
     private static ArrayList<Date> dates = new ArrayList<Date>();
     private static ArrayList<String> datesStrings = new ArrayList<String>();
-//    private static ArrayList<Integer> indices = new ArrayList<Integer>();
     private static TreeSet indices = new TreeSet();
 
 
     static void fill(JSONObject jsonObject) {
+        clear();
         if (jsonObject != null) {
             try {
                 JSONArray datesJsonArray = jsonObject.getJSONArray(DATES_ID);
                 for (int index = 0; index < datesJsonArray.length(); ++index) {
                     parseEvents(datesJsonArray.getJSONObject(index));
-//                    try {
-//                        JSONObject eventJSONObject = datesJsonArray.getJSONObject(index);
-//                        Event event = new Event(datesJsonArray.getJSONObject(index));
-//                        schedule.add(event);
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            int tt = 0;
-            tt++;
+        }
+        MainActivity mainActivity = MainActivity.getInstance();
+        if (mainActivity != null) {
+            mainActivity.updateSchedule();
         }
     }
 
 
+    private static void clear() {
+        schedule.clear();
+        dates.clear();
+        datesStrings.clear();
+        indices.clear();
+    }
 
-    private  static void parseEvents(JSONObject dateJsonObject) {
+
+    private static void parseEvents(JSONObject dateJsonObject) {
         try {
             String dateString = dateJsonObject.getString(DATE_ID);
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -77,38 +81,15 @@ public class Schedule {
         }
     }
 
-//    private func parseEvents(dateObject: NSDictionary) {
-//
-//        let dateString = dateObject[Fields.DATE_ID] as String
-//        let dateFormatter = NSDateFormatter()
-//        dateFormatter.dateFormat = "yyyy-MM-dd"
-//        let date = dateFormatter.dateFromString(dateString)
-//        dateFormatter.dateFormat = "EEEE, MMMM d"
-//        let newDateString = dateFormatter.stringFromDate(date!)
-//
-//        let eventsArray = dateObject[Fields.EVENTS_ID] as [NSDictionary]
-//        var events: [ATScheduleEvent] = []
-//        for eventDictionary in eventsArray {
-//            let event = ATScheduleEvent(eventDictionary)
-//            events.append(event)
-//            println(event)
-//        }
-//        let dateDictionary:[String: [ATScheduleEvent]] = [newDateString: events]
-//        dates1.append(dateDictionary)
-//    }
-
-
 
     public static ArrayList<Event> getSchedule() {
         return schedule;
     }
 
 
-
     public static ArrayList<Date> getDates() {
         return dates;
     }
-
 
 
     public static TreeSet getIndices() {

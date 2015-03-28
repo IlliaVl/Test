@@ -148,6 +148,7 @@ public class Team {
     public static void setCurrent(Team current) {
         Team.current = current;
         AteamoFetcher.getSharedInstance().loadMembers();
+        AteamoFetcher.getSharedInstance().loadSchedule(true);
         QBHelper.getSharedInstance().loginToCurrentTeamChat();
         if (MainActivity.getInstance() != null) {
             MainActivity.getInstance().currentTeamChanged(current);

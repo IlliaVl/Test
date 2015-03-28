@@ -99,7 +99,8 @@
                 android:textSize="18dp"
                 android:background="@drawable/green_button_rounded_corners"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp" />
+                android:paddingRight="10dp"
+                android:onClick="addPlayers" />
         </RelativeLayout>
 
         <ListView

@@ -19,4 +19,10 @@ public class ScheduleFragment extends BaseEventFragment {
         listAdapter = new ScheduleAdapter(getActivity());
         return super.onCreateView(inflater, container, savedInstanceState);
     }
+
+
+    public void update() {
+        ((ScheduleAdapter) listAdapter).update();
+        listAdapter.notifyDataSetChanged();
+    }
 }

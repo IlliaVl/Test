@@ -32,10 +32,14 @@ public class ScheduleAdapter extends BaseAdapter {
 
     public ScheduleAdapter(Context context) {
         inflater = LayoutInflater.from(context);
+        update();
+    }
+
+
+    public void update() {
         schedule = Schedule.getSchedule();
         datesStrings = Schedule.getDatesStrings();
         sectionIndices = Schedule.getIndices();
-        Log.i(TAG, "Schedule size: " + schedule.size());
     }
 
 

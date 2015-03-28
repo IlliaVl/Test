@@ -135,7 +135,7 @@ public class AteamoFetcher {
                     if (callback != null) {
                         callback.requestResponse(null);
                     }
-                    loadSchedule();
+//                    loadSchedule();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -158,14 +158,16 @@ public class AteamoFetcher {
 
 
 
-    public void loadSchedule() {
+    public void loadSchedule(boolean currentTeamSchedule) {
         Team currentTeam = Team.getCurrent();
-        if (currentTeam == null) {
+        if (currentTeamSchedule && currentTeam == null) {
             return;
         }
         Header[] headers = {new BasicHeader("Authorization", "Bearer " + accessToken)};
         RequestParams params = new RequestParams();
-        params.put("grp", currentTeam.getHash());
+        if (currentTeamSchedule) {
+            params.put("grp", currentTeam.getHash());
+        }
         AteamoRestClient.get(context, scheduleUrlString, headers, params, new AsyncHttpResponseHandler() {//new RequestParams("grp", currentTeam.getHash())
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -173,8 +175,6 @@ public class AteamoFetcher {
                 try {
                     JSONObject jsonObject = new JSONObject(decodedData);
                     Schedule.fill(jsonObject);
-                    int tt = 0;
-                    tt++;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
